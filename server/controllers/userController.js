@@ -1,7 +1,8 @@
 // login ,singup and deleteaccount  route there
-const {z, email} =require('zod');
+const {z} =require('zod');
 const bcrypt=require("bcrypt");
 const { user } = require('../model/scheam');
+const jwt=require('jsonwebtoken')
 
 const SingupValidation=z.object({
     username:z.string().min(4,'Username must be leaste 4 characters'),
@@ -22,7 +23,7 @@ exports.Register=async(req,res)=>{
       // check the user is already Presnt or not
       const alreadyPresntUser=await user.findOne({email:userSingup.email})
       if(alreadyPresntUser){
-        return res.status(409).json({
+        return res.status(403).json({
             status:false,
             message:"User already exits !"
         })
@@ -43,7 +44,7 @@ exports.Register=async(req,res)=>{
         console.log(err)
         res.status(400).json({
             status:false,
-            message:err.errors?.[0]?.message || 'Validaation error'
+            message:err.errors?.[0]?.message || 'Someting went wrong'
         })
     }
     
@@ -66,10 +67,16 @@ exports.LoginAccount=async(req,res)=>{
                 message:"Incocrrect Password"
             })
         }
+        const token=jwt.sign({
+            id:isAccount._id,
+            email:isAccount.email,
+        },
+        process.env.JWT_USER,{expiresIn:"172800000"})
         res.status(200).json({
             status:true,
+            token:token,
             message:"User Login successfully "
-        })
+        },)
     }catch(err){
      console.log(err)
         res.status(400).json({
@@ -78,3 +85,13 @@ exports.LoginAccount=async(req,res)=>{
         })
     }
 }
+// buy Books
+exports.PurchaseBook=async(req,res)=>{
+    try{
+        const userId=req.userId
+
+    }catch(err){
+
+    }
+}
+

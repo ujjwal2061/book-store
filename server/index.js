@@ -1,5 +1,6 @@
 const  express=require("express")
 const userRouters=require("./routes/userRoute")
+const adminRouters=require("./routes/adminRouters")
 const connectiondb=require("./config/db")
 require('dotenv').config()
 
@@ -15,6 +16,8 @@ app.get("/",(req,res)=>{
 connectiondb();
 
 app.use("/api/v1/user",userRouters)
+app.use("/api/v1/admin",adminRouters)
+
 
 app.listen(PORT,()=>{
     console.log(`Server is running at port ${PORT}`)
