@@ -1,4 +1,4 @@
-const {z}= require ("zod");
+const {z, json}= require ("zod");
 const {admin,book} =require("../model/scheam")
 const bcrypt=require("bcrypt");
 const jwt=require("jsonwebtoken")
@@ -51,10 +51,7 @@ exports.SingupAsAdmin=async(req ,res)=>{
 exports.SinginAsAdmin=async(req ,res)=>{
     try{
         const adminLogin=LoginadminValidation.parse(req.body);
-         if (!adminLogin.success) {
-          return res.status(403).json({ error: adminLogin.error.errors });
-          }
-        const isAccount=await admin.findOne({email:LoginadminValidation.email})
+        const isAccount=await admin.findOne({email:adminLogin.email})
         if(!isAccount){
             return res.status(403).json({
                 status:false,
@@ -85,20 +82,29 @@ exports.SinginAsAdmin=async(req ,res)=>{
             message:"Admin Login successfully "
         })
     }catch(err){
-        console.log(err.message)
+        console.log("In Login",err)
         res.status(400).json({
             status:false,
-            message:err.errors?.[0]?.message || 'Validaation error'
+            message:err.message || 'Validaation error'
         })
     }
 }
 
 // see all books List
+// need to add the pageations and filter  
 exports.AllbooksList=async(req,res)=>{
     try{
-
+     const  allbooksListed=await book.find({});
+     res.status(200).json({
+        status:true,
+        message:"Booked listed",
+        data:allbooksListed
+     })
     }catch(err){
-
+        console.log('Error at store',err)
+            res.status(500).json({
+            message:err.error|| "Something wrong "
+        })
     }
 }
 // add book to Store
@@ -148,4 +154,61 @@ exports.StoreBooks=async(req,res)=>{
             message:err.error|| "Something wrong "
         })
      }
+}
+// update books
+exports.Updatebook=async(req,res)=>{
+    try{
+  const  bookId=req.params.id;
+  const updateInfo=req.body;
+  if(!bookId && !updateInfo){
+     return res.status(400).json({
+         status:false,
+         message:"Book ID and update data are need"
+     })
+  }
+  const updatedata=await book.findByIdAndUpdate(bookId,updateInfo,{new:true});
+        if (!updatedata) {
+            return res.status(404).json({
+                status: false,
+                message: "Book not found",
+            });
+        }
+        res.status(200).json({
+            status:true,
+            message:"Book updated successfully",
+            data:updatedata
+        })
+    }catch(err){
+        res.status(500).json({
+            status:false,
+            message:"Smothing went wrong"
+        })
+    }
+}
+// delete books
+exports.DeleteBook=async(req,res)=>{
+    try{
+        const {bookId}=req.params.id;
+        const adminId=req.body;
+        if(!adminId && !bookId){
+            return res.status(403).json({
+                status:false,
+                message:"Admin Id is missing !"
+            })
+        }
+        const deletedBook=await book.findOneAndDelete(
+          bookId
+        )
+        res.status(200).json({
+            status:true,
+          message: `Book '${deletedBook.title}' deleted successfully.`,
+          data:deletedBook
+        })
+    }catch(err){
+        console.log(err)
+      res.status(500).json({
+            status:false,
+            message:"Smothing went wrong"
+        })  
+    }
 }
