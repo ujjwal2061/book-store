@@ -1,7 +1,7 @@
 exports.BookImage = asyunc = (req, res) => {
   try {
     if (!req.file) {
-      return res.status(403).json({
+      return res.status(400).json({
         status: false,
         message: "File not uploaded !",
       });
