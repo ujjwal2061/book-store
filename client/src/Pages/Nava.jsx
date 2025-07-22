@@ -26,28 +26,28 @@ const [isMoblieOpen ,setMoblieOpen]=useState(false);
             </button>
           </label>
         </div>
-        {/*Moblie Section*/}
+
          <div className="">
            <button onClick={()=>setMoblieOpen(!isMoblieOpen)} className="md:hidden flex cursor-pointer justify-center shadow-2xl  p-2 bg-mycolor/15 rounded-full">
              {isMoblieOpen ? <X /> : <Menu className="rounded-2xl" />}
             </button>
             {isMoblieOpen &&(
-                <div className=" md:hidden bg-[#fdf7f7e2]  border-transparent  shadow-2xl w-48 rounded-md mt-1 absolute  right-0 flex flex-col border-2 p-2  gap-2 ">
+                <div className=" md:hidden bg-[#fdf7f7e2]   w-full z-30  border-transparent sm:w-72 shadow-2xl  rounded-md mt-1 absolute  right-0 flex flex-col border-2 p-2  gap-2 ">
             <sapn className="btn rounded-md  text-center font-semibold border-mycolor border-2 px-6 py-2 ">
-            <Link>Login</Link>
+            <Link to="/login">Login</Link>
           </sapn>
           <span className="rounded-md  text-center font-semibold text-white border-mycolor px-6 bg-mycolor py-2 ">
-            <Link>Singup</Link>
+            <Link to="/signup">Singup</Link>
           </span>
             </div>
            ) }
            </div>
         <div className=" hidden md:flex  font-sans font-semibold gap-2  items-center ">
           <button className="btn rounded-md  border-mycolor border-2 px-6 py-2 ">
-            <Link>Login</Link>
+            <Link to="/login">Login</Link>
           </button>
           <button className="rounded-md  text-white border-mycolor px-6 bg-mycolor py-2 ">
-            <Link>Singup</Link>
+            <Link to="/signup">Singup</Link>
           </button>
         </div>
       </nav>
