@@ -3,9 +3,11 @@ import Login from "./auth/Login"
 import Signup from "./auth/Singup"
 import AdminSignup from "./Admin/auth/admin_signup"
 import Layout from "./Layout/Layout"
-import { useContext } from "react"
+import {  useContext } from "react"
 import {Usercontext} from "./Users/context/userContext"
-import { Profile } from "./Users/Profile"
+import { My_Space,} from "./Users/My_Space"
+import  {Profile} from "./Users/Proflie"
+
 function App() {
  const {user}=useContext(Usercontext);
  if(!user) return<p>Loading..</p>
@@ -15,7 +17,8 @@ function App() {
      <Route path="/login" element={<Login />} />
      <Route path="/signup" element={<Signup />} />
       <Route path="/admin-signup" element={<AdminSignup />} />
-      <Route path="/my-space" element={<Profile />} />
+      <Route path="/my-space" element={<My_Space />} />
+      <Route path="/profile" element={<Profile />} />
      {/* <Route path="/store" element={<Store />} />
      <Route path="/profile" element={<Profile />} />
      <Route path="/book/:id" element={<Book />} />
