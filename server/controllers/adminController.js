@@ -40,6 +40,7 @@ exports.SingupAsAdmin = async (req, res) => {
       message: "Acount create successfully",
     });
   } catch (err) {
+    console.log(err)
     res.status(400).json({
       status: false,
       message: err.errors?.[0]?.message || "Someting went wrong",
