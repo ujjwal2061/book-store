@@ -1,21 +1,29 @@
 import { Link } from "react-router"; 
 import { useReducer } from "react";
 import { LoaderIcon } from "lucide-react";
+import axios from "axios"
+import { useNavigate } from "react-router";
 
 const Signup = () => {
+  const navigation=useNavigate();
+
   const initValueOfSignup = {
-    username: "",
+    firstname: "",
+    lastname:"",
     email: "",
     password: "",
     loading: false,
     error: null,
+    fieldErrors:{},
   };
 
 
   const authSignupProcess = (state, action) => {
     switch (action.type) {
-      case "SET_USERNAME":
-        return { ...state, username: action.payload };
+      case "SET_FIRSTNAME":
+        return { ...state, firstname: action.payload };
+        case "SET_LASTNAME":
+        return { ...state, lastname: action.payload };
       case "SET_EMAIL":
         return { ...state, email: action.payload };
       case "SET_PASSWORD":
@@ -24,6 +32,8 @@ const Signup = () => {
         return { ...state, loading: true, error: null };
         case "SET_SIGNUP_DONE":
         return { ...state, loading: false, error: null };
+        case "SET_FIELD_ERRORS":
+      return { ...state, fieldErrors: action.payload };
       case "SET_SIGNUP_FAIL":
         return { ...state, loading: false, error: action.payload };
       default:
@@ -33,9 +43,12 @@ const Signup = () => {
 
   const [state, dispatch] = useReducer(authSignupProcess, initValueOfSignup);
 
- 
+
   const handleUsername = (e) => {
-    dispatch({ type: "SET_USERNAME", payload: e.target.value });
+    dispatch({ type: "SET_FIRSTNAME", payload: e.target.value });
+  };
+  const lastUsername = (e) => {
+    dispatch({ type: "SET_LASTNAME", payload: e.target.value });
   };
   const handleEmail = (e) => {
     dispatch({ type: "SET_EMAIL", payload: e.target.value });
@@ -44,15 +57,43 @@ const Signup = () => {
     dispatch({ type: "SET_PASSWORD", payload: e.target.value });
   };
 
-  const handleSignupForm = (e) => {
+  const handleSignupForm = async(e) => {
     e.preventDefault();
     dispatch({ type: "SET_SIGNUP_START" });
     try {
-      console.log("Username:", state.username);
-      console.log("Email:", state.email);
-      console.log("Password:", state.password);
+      //api call 
+      const  response=await axios.post("http://localhost:3000/api/v1/user/signup",
+        {
+          firstname:state.firstname,
+          lastname:state.lastname,
+          email:state.email,
+          password:state.password 
+        },{
+          headers:{"Content-Type":"application/json" }
+        }
+      )
+      const res= await response.data;
+      state.firstname="";
+      state.lastname="";
+      state.email="";
+      state.password="";
+      navigation('/login')
+      return res;
+      
+      
     } catch (err) {
-      dispatch({ type: "SET_SIGNUP_FAIL", payload: err.message });
+      if(err.response?.data?.errors){
+        const zodErro=err.response.data.errors;
+        const Error={};
+        zodErro.forEach(element => {
+          const field=zodErro.path[0];
+          Error[field]=zodErro.message;
+        });
+        dispatch({ type: "SET_FIELD_ERRORS", payload: errorMap });
+      } 
+      else{
+        dispatch({ type: "SET_SIGNUP_FAIL", payload: err.message });
+      }
     }finally{
         dispatch({type:'SET_SIGNUP_DONE'})
     }
@@ -67,14 +108,28 @@ const Signup = () => {
 
         <form onSubmit={handleSignupForm} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
             <input
               type="text"
-              value={state.username}
+              value={state.firstname}
               onChange={handleUsername}
-              placeholder="Enter your username"
+              placeholder="Enter your firstname"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-mycolor focus:border-mycolor transition-colors"
             />
+            {state.fieldErrors.firstname && (
+            <p className="text-red-500 text-sm mt-1">{state.fieldErrors.firstname}</p> )}
+          </div>
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+            <input
+              type="text"
+              value={state.lastname}
+              onChange={lastUsername}
+              placeholder="Enter your lastname"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-mycolor focus:border-mycolor transition-colors"
+            />
+            {state.fieldErrors.lastname && (
+            <p className="text-red-500 text-sm mt-1">{state.fieldErrors.lastname}</p> )}
           </div>
 
           <div>
@@ -86,6 +141,8 @@ const Signup = () => {
               placeholder="example@gmail.com"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1  focus:ring-mycolor focus:border-mycolor transition-colors"
             />
+            {state.fieldErrors.email && (
+            <p className="text-red-500 text-sm mt-1">{state.fieldErrors.email}</p> )}
           </div>
 
           <div>
@@ -97,6 +154,8 @@ const Signup = () => {
               placeholder="Enter your password"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-mycolor focus:border-mycolor transition-colors"
             />
+            {state.fieldErrors.password && (
+            <p className="text-red-500 text-sm mt-1">{state.fieldErrors.password}</p> )}
           </div>
 
           <button

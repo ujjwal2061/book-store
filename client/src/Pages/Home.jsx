@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Menu, BookOpen, ChevronDown } from "lucide-react";
+import axios from "axios"
 
 const Home = () => {
   const genrestype = [
@@ -14,13 +15,31 @@ const Home = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState("All Genres");
   const [isActive, setActive] = useState(null);
+  const [loading ,setLodaing]=useState(false);
 
   const handleGenreSelect = (genre, idx) => {
     setSelectedGenre(genre);
     setActive(idx);
     setIsOpen(false); 
   };
-
+  // post requests for filter options 
+   const FilterRquest=async(genere)=>{
+    console.log("The gener is ",genere)
+       setLodaing(true);
+       try{
+         const request=await axios.post(`http://localhost:3000/api/v1/user/books-filter`,
+          { name:genere},
+          {  headers:{"Content-Type": "application/json", }}
+         )
+         
+        const res=   await request.data;
+        console.log(res);
+      }catch(err){
+        console.log("Error from the Forntend",err)
+      }finally{
+        setLodaing(false);
+      }
+   }
   return (
     <div className="w-full px-4 md:px-6 py-7">
       <div className="  flex flex-wrap justify-center md:justify-between items-center gap-4 px-4 md:px-8">
@@ -32,7 +51,10 @@ const Home = () => {
           {genrestype.map((genre, idx) => (
             <button
               key={idx}
-              onClick={() => handleGenreSelect(genre, idx)}
+              onClick={() => {
+                FilterRquest(genre);
+                handleGenreSelect(genre, idx)
+              }}
               className="relative px-3 py-1.5 font-medium transition-colors cursor-pointer"
             >
               <span

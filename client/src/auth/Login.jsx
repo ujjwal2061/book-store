@@ -2,10 +2,12 @@
 import { Link } from "react-router";
 import { useReducer } from "react";
 import { LoaderIcon } from "lucide-react";
-
+import { useNavigate } from "react-router";
+import axios from "axios";
 // during first redner initvalue of the form 
 
 const Login = () => {
+  const navigation=useNavigate();
     // during first redner initvalue of the form 
 const initValue={
     email:"",
@@ -37,19 +39,46 @@ const authProcess=(state ,action)=>{
     dispatch({type:'SET_PASSWORD' ,payload:e.target.value})
    }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     dispatch({type:"LOGIN_START"})
      try{
-     console.log("Emial",state.email);
-     console.log("Password",state.password)
-     setTimeout(()=>{
-       console.log("Login success");
-     },200)
-
-     }catch(err){
-        dispatch({type:"LOGIN_FAIL" ,payload:err.message})
-     }
+      const  response=await axios.post("http://localhost:3000/api/v1/user/login",
+        {
+          firstname:state.firstname,
+          lastname:state.lastname,
+          email:state.email,
+          password:state.password 
+        },{
+          headers:{"Content-Type":"application/json" }
+        }
+      )
+      const res= await response.data;
+      if(res.status){
+        return localStorage.setItem("authToken",res.token);
+      }
+      navigatsion('/')
+      state.firstname="";
+      state.lastname="";
+      state.email="";
+      state.password="";
+      return res;
+     }catch (err) {
+      if(err.response?.data?.errors){
+        const zodErro=err.response.data.errors;
+        const Error={};
+        zodErro.forEach(element => {
+          const field=zodErro.path[0];
+          Error[field]=zodErro.message;
+        });
+        dispatch({ type: "SET_FIELD_ERRORS", payload: errorMap });
+      } 
+      else{
+        dispatch({ type: "SET_SIGNUP_FAIL", payload: err.message });
+      }
+    }finally{
+        dispatch({type:'SET_SIGNUP_DONE'})
+    }
   };
 
   return (

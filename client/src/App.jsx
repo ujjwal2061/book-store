@@ -1,13 +1,21 @@
 import {Routes ,Route} from "react-router"
 import Login from "./auth/Login"
 import Signup from "./auth/Singup"
+import AdminSignup from "./Admin/auth/admin_signup"
 import Layout from "./Layout/Layout"
+import { useContext } from "react"
+import {Usercontext} from "./Users/context/userContext"
+import { Profile } from "./Users/Profile"
 function App() {
+ const {user}=useContext(Usercontext);
+ if(!user) return<p>Loading..</p>
   return (
    <Routes>
-     <Route path="/" element={<Layout />} />
+     <Route path="/" element={ <Layout />} />
      <Route path="/login" element={<Login />} />
      <Route path="/signup" element={<Signup />} />
+      <Route path="/admin-signup" element={<AdminSignup />} />
+      <Route path="/my-space" element={<Profile />} />
      {/* <Route path="/store" element={<Store />} />
      <Route path="/profile" element={<Profile />} />
      <Route path="/book/:id" element={<Book />} />
