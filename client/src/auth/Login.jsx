@@ -55,9 +55,9 @@ const authProcess=(state ,action)=>{
       )
       const res= await response.data;
       if(res.status){
-        return localStorage.setItem("authToken",res.token);
+         localStorage.setItem("authToken",res.token);
+          return navigation('/')
       }
-      navigatsion('/')
       state.firstname="";
       state.lastname="";
       state.email="";

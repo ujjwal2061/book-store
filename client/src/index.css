@@ -1,9 +1,19 @@
+
 @import "tailwindcss";
+
 
 @theme {
   --color-mint-500: oklch(0.72 0.11 178);
-  --color-mycolor:#c21d37;
+  --color-mycolor: #c21d37;
 }
-@theme {
- 
+
+body {
+  font-family: 'Nunito', sans-serif;
+}
+
+.nunito{
+  font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-weight:12px;
+  font-style: normal;
 }

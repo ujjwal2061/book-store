@@ -43,7 +43,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="w-full bg-gradient-to-br from-slate-50 via-white to-slate-100 border-gray-200">
+    <footer className="w-full bg-gradient-to-br from-slate-100 via-white to-slate-200 border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
         
@@ -103,9 +103,9 @@ const Footer = () => {
                 <a
                   href={link.url}
                   key={idx}
-                  className="block text-gray-600 hover:text-mycolor font-medium transition-colors duration-200  transform"
+                  className="block  px-3 w-44 t hover:text-mycolor font-medium transition-colors duration-200  transform"
                 >
-                  {link.linkName}
+                  <span className="hover:text-mycolor text-gray-600"> {link.linkName}</span> 
                 </a>
               ))}
             </div>

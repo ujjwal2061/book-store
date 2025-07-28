@@ -7,12 +7,17 @@ export const ContextProvider=({children})=>{
     const [user ,setUser]=useState(null);
     const [loading ,setLoading]=useState(false);
     const [error,setError]=useState("");
+    const [IsOpen ,setOpen]=useState(true);
     // Get user from the db
     useEffect( ()=>{
         const fetchUser=async ()=>{
+          const token=localStorage.getItem("authToken");
+          if(!token){
+            setUser(null);
+            return ;
+          }
             try{
                 setLoading(true);
-                const token=localStorage.getItem("authToken");
               const response= await axios.get("http://localhost:3000/api/v1/user/my-details",{
               headers: {
                         Authorization: `Bearer ${token}`,
@@ -21,10 +26,12 @@ export const ContextProvider=({children})=>{
                     withCredentials: true 
             })
             const res=await response.data;
+            
             setUser(res.data);
         }catch(err){
               setError(err.message|| "Something went wrong")
             console.log("Error",err)
+            setUser(null);
         }finally{
       setLoading(false)
      }
@@ -34,7 +41,7 @@ export const ContextProvider=({children})=>{
 
           
 
-const contextValue={user,setUser,loading,setLoading,error,setError}
+const contextValue={user,setUser,loading,setLoading,error,setError,IsOpen ,setOpen}
     return(
   <Usercontext.Provider value={contextValue}>
     {children}

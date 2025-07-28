@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Menu, BookOpen, ChevronDown } from "lucide-react";
+import { Menu, BookOpen, ChevronDown ,Star,ShoppingCart} from "lucide-react";
 import axios from "axios"
+import Content from "./Content";
 
 const Home = () => {
   const genrestype = [
@@ -40,9 +41,45 @@ const Home = () => {
         setLodaing(false);
       }
    }
+     const books = [
+    {
+      author: "George Orwell",
+      bookname: "1984",
+      title: "dystopia1984",
+      description: "A novel about a dystopian future where Big Brother watches all.",
+      image: "https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg",
+      price: "299",
+      rating: 4.8,
+      genre: "Dystopian",
+    },
+        {
+      author: "George Orwell",
+      bookname: "1984",
+      title: "dystopia1984",
+      description: "A novel about a dystopian future where Big Brother watches all.",
+      image: "https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg",
+      price: "299",
+      rating: 4.8,
+      genre: "Dystopian",
+    },
+       {
+      author: "George Orwell",
+      bookname: "1984",
+      title: "dystopia1984",
+      description: "A novel about a dystopian future where Big Brother watches all.",
+      image: "https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg",
+      price: "299",
+      rating: 4.8,
+      genre: "Dystopian",
+    },
+    
+     
+  ];
+
+
   return (
-    <div className="w-full px-4 md:px-6 py-7">
-      <div className="  flex flex-wrap justify-center md:justify-between items-center gap-4 px-4 md:px-8">
+    <div className="w-full px-4 md:px-6 py-8 ">
+      <div className=" flex flex-wrap justify-center md:justify-between items-center gap-4 px-4 md:px-8">
         <button className="hidden md:flex items-center gap-2 px-3 py-2 bg-mycolor/10 rounded-md font-semibold text-gray-800">
           <Menu size={18} />
           All Categories
@@ -72,6 +109,7 @@ const Home = () => {
             </button>
           ))}
         </div>
+      
         <div className="md:hidden  w-full sm:w-96 flex justify-center">
           <div className="flex items-center gap-3 bg-gradient-to-r from-mycolor/20 to-purple-100 rounded-lg p-3 w-full">
             <BookOpen className="text-purple-600 w-5 h-5" />
@@ -108,7 +146,45 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="mt-10 rounded-md bg-[rgb(218,245,255)] px-4 md:px-10 py-3">
+      <div className=' grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 '>
+              {books.map((book,idx)=>(
+                <div  key={idx} className=' flex flex-col sm:max-w-md w-auto   sm:flex-row rounded-xl bg-neutral-50  transition-all duration-300  ease-in-out  cursor-pointer shadow px-1 py-2'>
+                <div className='sm:w-52 w-full p-1 '>
+                  <img src="https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg"  className='object-cover rounded-xl w-full h-full'/>
+                </div>
+                    <div className="flex flex-col gap-3  px-2">
+                    <div>
+                      <h1 className="text-2xl font-bold text-gray-900">{book.bookname}</h1>
+                      <p className="text-sm text-gray-600 font-medium">
+                        By <span className="text-gray-900 font-semibold">{book.author}</span>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 text-yellow-500">
+                      <Star size={18} fill="currentColor" className="text-yellow-400" />
+                      <span className="text-gray-800 text-sm font-semibold">{book.rating}</span>
+                      <span className="ml-2 text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full">-20% OFF</span>
+                    </div>
+                  <div className='flex flex-col gap-2  text-start'>
+                         <div className="text-lg font-bold text-gray-900">
+                        ${book.price} <span className="line-through text-sm text-gray-400 ml-2">${book.originalPrice}</span>
+                       </div>
+                    <p className='text-sm leading-snug text-start tracking-tight font-semibold'>
+                     {book.description}
+                    </p>
+                    <div className='flex flex-col gap-2  w-full '>
+                      <button className="bg-mycolor cursor-pointer hover:bg-red-700 text-white py-2 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-semibold transition">
+                        <ShoppingCart size={18} /> Add to Cart
+                      </button>
+                      <p className="text-sm text-gray-600 font-medium">
+                        Categories: <span className="text-gray-900 font-semibold">{book.genre}</span></p>
+                    </div>
+                  </div>
+                </div>
+               </div>
+              ))}
+            </div> 
+
+      <div className="mt-6 rounded-md bg-[rgb(218,245,255)] px-4 md:px-10 py-3">
         <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-6">
           <div className="flex flex-col gap-6 max-w-xl">
             <div className="text-start space-y-3">
@@ -134,6 +210,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+      <Content />
     </div>
   );
 };
