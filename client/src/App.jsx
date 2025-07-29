@@ -8,7 +8,7 @@ import {  useContext } from "react"
 import {Usercontext} from "./Users/context/userContext"
 import  {Profile} from "./Users/Proflie"
 import { BookStore } from "./Users/Store/Book_Store"
-
+import { StoreForm } from "./Admin/AdminStore/Store_Form"
 function App() {
  const {loading}=useContext(Usercontext);
  if(loading) return<p>Loading..</p>
@@ -16,9 +16,11 @@ function App() {
    <Routes>
      <Route path="/" element={<Layout />} >
      <Route index element={<Home />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/store" element={<BookStore />} />
+      <Route path="/profile" element={<Profile />} >
+       <Route path="store" element={<BookStore />} />
+      </Route>
      </Route>
+     <Route path="/store-form" element={<StoreForm />} />
      <Route path="/login" element={<Login />} />
      <Route path="/signup" element={<Signup />} />
       <Route path="/admin-signup" element={<AdminSignup />} />
