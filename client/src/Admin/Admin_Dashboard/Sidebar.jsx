@@ -1,4 +1,4 @@
-import { ChevronFirst, ChevronLast, LogOut, User2, Store, LayoutDashboard, Settings, ShoppingCart, Users, BarChart3, Package, Bell, Search } from "lucide-react"
+import { ChevronFirst, ChevronLast, LogOut, } from "lucide-react"
 import { createContext, useContext, useState } from "react"
 
 const SideContext = createContext();
@@ -6,8 +6,8 @@ const SideContext = createContext();
 export const Sidebar = ({ children }) => {
   const [expanded, setExpanded] = useState(true);
   return (
-    <aside className={`h-screen ${expanded ? "w-52" : "w-20"} transition-all duration-300`}>
-      <nav className="h-full flex flex-col bg-neutral-100 border-r border-neutral-200 shadow-2xl">
+    <aside className={`min-h-screen ${expanded ? "w-52" : "w-20"} transition-all duration-300`}>
+      <nav className="h-full  fixed flex flex-col bg-neutral-100 border-r border-neutral-200 shadow-2xl">
         <div className="p-4 pb-2 flex justify-between items-center">
           <div className={`overflow-hidden transition-all ${expanded ? "w-32" : "w-0"}`}>
             <h1 className="text-xl font-bold text-mycolor">Dashboard</h1>
