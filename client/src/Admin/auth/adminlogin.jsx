@@ -1,7 +1,8 @@
 
-import { Link } from "react-router";
+import { Link ,useNavigate} from "react-router";
 import { useReducer } from "react";
 import { LoaderIcon } from "lucide-react";
+import axios from "axios";
 
 // during first redner initvalue of the form 
 
@@ -13,6 +14,7 @@ const initValue={
     loading:false,
     error:null,
 } 
+ const route=useNavigate();
 //  function 
 const authProcess=(state ,action)=>{
     switch(action.type){
@@ -37,16 +39,30 @@ const authProcess=(state ,action)=>{
     dispatch({type:'SET_PASSWORD' ,payload:e.target.value})
    }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     dispatch({type:"LOGIN_START"})
      try{
-     console.log("Emial",state.email);
-     console.log("Password",state.password)
-     setTimeout(()=>{
-       console.log("Login success");
-     },200)
+    const  response=await axios.post("http://localhost:3000/api/v1/admin/admin-login",
 
+      {
+        email:state.email,
+        password:state.password,
+      },
+      {
+        headers:{
+          "Content-Type":"application/json"     
+          },
+      }
+    )
+    const res=await response.data;
+    if(res.status){
+         localStorage.setItem("adminToken",res.token);
+          return  route('/admin-dashbord')
+      }
+    state.email="";
+    state.password="";
+    return res;
      }catch(err){
         dispatch({type:"LOGIN_FAIL" ,payload:err.message})
      }

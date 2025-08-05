@@ -1,12 +1,14 @@
 import { useContext, useState } from "react";
 import { Usercontext } from "../../Users/context/userContext";
 import { Loader } from "lucide-react";
+import axios from "axios";
 export default function UpadateStorePage() {
   const { user } = useContext(Usercontext);
   const { firstname, lastname } = user.data;
   const [loading ,setLoading]=useState(false);
-  const [error  ,setError]=useState("")
+  const [error  ,setError]=useState(null)
   const [preview, setPreview] = useState("");
+  // form handle 
   const [form, setForm] = useState({
     author: "",
     bookname: "",
@@ -17,7 +19,7 @@ export default function UpadateStorePage() {
     genre: "",
     rating: "",
   });
-
+  const token=localStorage.getItem("adminToken");
   const handleForm = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
@@ -31,12 +33,50 @@ export default function UpadateStorePage() {
       setForm((prev) => ({ ...prev, image: file }));
     }
   };
- const handleBookAdd=(e)=>{
+ const handleBookAdd=async(e)=>{
+  alert("hello")
  e.preventDefault()
  try{
   setLoading(true)
-  console.log("All data ",form)
-  setForm(" ")
+  setError(null);
+  // sending the formaData
+  const formData=new FormData();
+  if(!form.title || !form.author){
+    setError("Fill the filed please");
+    return
+  }
+  formData.append("author",form.author);
+     formData.append("bookname", form.bookname);
+    formData.append("title", form.title);
+    formData.append("description", form.description);
+    formData.append("price", form.price);
+    formData.append("genre", form.genre);
+
+    
+      const  response=await axios.post("http://localhost:3000/api/v1/admin/storebooks",
+        formData,
+        {
+      
+          headers:{
+              Authorization:`Bearer ${token}`,
+            "Content-Type":"application/josn"
+          },
+            withCredentials:true
+        },
+       
+       
+      )
+      console.log("Data",response);
+      setForm({
+        author: "",
+        bookname: "",
+        title: "",
+        description: "",
+        image: "",
+        price: "",
+        genre: "",
+        rating: "",
+      });
 }catch(err){
  setError(err || "Try again")
 }finally{
@@ -156,7 +196,7 @@ function InputField({ label, ...props }) {
 
 function TextAreaField({ label, ...props }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col  overflow-hidden">
       <label className="text-sm font-medium text-gray-700 mb-1">{label}</label>
       <textarea
         rows={3}

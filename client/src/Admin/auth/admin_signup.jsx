@@ -1,6 +1,7 @@
-import { Link } from "react-router"; 
+import { Link, useNavigate } from "react-router"; 
 import { useReducer } from "react";
 import { LoaderIcon } from "lucide-react";
+import axios from "axios";
 
 const AdminSignup = () => {
   const initValueOfSignup = {
@@ -12,7 +13,7 @@ const AdminSignup = () => {
     error: null,
   };
 
-
+ const  navigation=useNavigate();
   const authSignupProcess = (state, action) => {
     switch (action.type) {
       case "SET_FIRSTNAME":
@@ -51,10 +52,27 @@ const AdminSignup = () => {
     dispatch({ type: "SET_PASSWORD", payload: e.target.value });
   };
 
-  const handleSignupForm = (e) => {
+  const handleSignupForm = async(e) => {
     e.preventDefault();
     dispatch({ type: "SET_SIGNUP_START" });
     try {
+       const  response=await axios.post("http://localhost:3000/api/v1/admin/admin-singup",
+        {
+          firstname:state.firstname,
+          lastname:state.lastname,
+          email:state.email,
+          password:state.password 
+        },{
+          headers:{"Content-Type":"application/json" }
+        }
+      )
+      const res= await response.data;
+       state.firstname="";
+      state.lastname="";
+      state.email="";
+      state.password="";
+      navigation('/admin-login')
+      return res;
       console.log("Username:", state.username);
       console.log("Email:", state.email);
       console.log("Password:", state.password);

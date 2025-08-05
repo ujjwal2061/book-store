@@ -9,6 +9,7 @@ import {Usercontext} from "./Users/context/userContext"
 import  {Profile} from "./Users/Proflie"
 import { BookStore } from "./Users/Store/Book_Store"
 import { DashboardView } from "./Admin/Admin_Dashboard/Admin_Dashboard_view"
+import AdminLogin from "./Admin/auth/adminlogin"
 function App() {
  const {loading}=useContext(Usercontext);
  if(loading) return<p>Loading..</p>
@@ -23,7 +24,8 @@ function App() {
       <Route path="/admin-dashbord" element={<DashboardView />} />
      <Route path="/login" element={<Login />} />
      <Route path="/signup" element={<Signup />} />
-      <Route path="/admin-signup" element={<AdminSignup />} />
+      <Route path="/admin-signup" element={<AdminSignup />} /> 
+      <Route path="/admin-login" element={<AdminLogin />} />
      
      {/* <Route path="/store" element={<Store />} />
      <Route path="/profile" element={<Profile />} />
