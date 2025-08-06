@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AccountPage } from "../Admin_page/AccountPage";
 import DashboardPage from "../Admin_page/DashboardPage";  
 import UpadateStorePage from "../Admin_page/UpadateStorePage";
-import StorePage from "../Admin_page/StorePage";
+
 
 export const DashboardView=() => {
     const [activePage ,setActivepage]=useState("dashbord")
@@ -12,8 +12,6 @@ export const DashboardView=() => {
         switch(activePage){
             case 'dashbord':
             return <DashboardPage />
-             case 'store':
-            return <StorePage />
              case 'account':
             return <AccountPage />
              case 'upload':
@@ -28,10 +26,6 @@ export const DashboardView=() => {
       <SidebarItems icons={<LayoutDashboard size={23} />} 
       text="Dashboard" active={activePage==="dashbord"} 
       onClick={()=>setActivepage('dashbord')}
-      />
-      <SidebarItems icons={<Store size={23} />} text="Store"
-      active={activePage==="store"} 
-      onClick={()=>setActivepage('store')}
       />
       <SidebarItems icons={<BookAIcon size={23} />} text="Upload"
       active={activePage==="upload"} 

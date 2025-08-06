@@ -1,7 +1,8 @@
 const {z}= require ("zod");
 const {admin,book} =require("../model/scheam")
 const bcrypt=require("bcrypt");
-const jwt=require("jsonwebtoken")
+const jwt=require("jsonwebtoken");
+
 
 
 
@@ -40,7 +41,6 @@ exports.SingupAsAdmin = async (req, res) => {
       message: "Acount create successfully",
     });
   } catch (err) {
-    console.log(err)
     res.status(400).json({
       status: false,
       message: err.errors?.[0]?.message || "Someting went wrong",
@@ -81,13 +81,40 @@ exports.SinginAsAdmin = async (req, res) => {
       message: "Admin Login successfully ",
     });
   } catch (err) {
+    console.log(err)
     res.status(400).json({
       status: false,
       message: err.message || "Validaation error",
     });
   }
 };
+ // get info of admin
+ exports.AdminInfo=async(req,res)=>{
+  try{
+    const Admin=await admin.findById(req.adminId);
+    if(!Admin){
+      res.status(400).josn({
+        status:false,
+        message:"Admin  does't exits!"
+      })
+    }
+    //
+    const adminInfo={...Admin.toObject()};
+    delete adminInfo.password;
+     res.status(200).json({
+    status:true,
+     data:{
+        data:adminInfo
+     }
+  })
+  }catch(err){
+        res.status(500).json({
+            status:false,
+            message:"Something Went Wrong"
+        })
+    }
 
+ }
 // see all books List
 // need to add the pageations and filter
 exports.AllbooksList = async (req, res) => {
@@ -104,14 +131,33 @@ exports.AllbooksList = async (req, res) => {
     });
   }
 };
+// upload image 
+exports.AddImage=async(req,res)=>{
+  try{
+    if(!req.file){
+      return res.status(400).json({
+        status:false,
+        message:"No file uploaded"
+      })
+    }
+    const imageLink=req.file.path;
+    res.json({link:imageLink})
+  }catch(err){
+    console.log(err)
+     res.status(500).json({
+        status: "Fail",
+        msg: "Internal Server Error"
+      });
+  }
+}
 // add book to Store
 exports.StoreBooks = async (req, res) => {
   try {
     const adminId = req.adminId;
-    const books = req.body;
-    const { bookname, author, title, description, price, genre, image } = books;
 
-    if (!books) {
+    const { bookname, author, title, description, price, genre, image } =req.body;
+
+    if (!bookname || !author || !title || !description || !price || !genre) {
       return res.status(400).json({
         status: false,
         message: "Please fill all Filed ",
@@ -133,6 +179,7 @@ exports.StoreBooks = async (req, res) => {
       price: price,
       image: image,
       genre: genre,
+      rating:0|| "",
       createdId: adminId,
     });
     await newbook.save();
@@ -147,6 +194,30 @@ exports.StoreBooks = async (req, res) => {
     });
   }
 };
+// get book by  createdID
+exports.GetBookByCreatedId=async(req,res)=>{
+   try {
+    const adminID = req.adminId; 
+    if (!adminID) {
+      return res.status(401).json({
+        status: false,
+        message: "Please login to access this resource",
+      });
+    }
+    const createdId=await book.find({createdId:adminID}).populate()
+    res.status(200).json({
+      status:true,
+      message:"Your add booked list",
+      data:createdId
+    })
+  }catch(err){
+    res.status(500).json({
+      status:false,
+      message:"Internal Server Error"
+    })
+  }
+   
+}
 // get book by Id
 exports.BookById = async (req, res) => {
   const bookId = req.params.id;
@@ -205,7 +276,7 @@ exports.Updatebook=async(req,res)=>{
 // delete books
 exports.DeleteBook=async(req,res)=>{
     try{
-        const {bookId}=req.params.id;
+        const bookId=req.params.id;
         const adminId=req.body;
         if(!adminId && !bookId){
             return res.status(403).json({
@@ -213,9 +284,7 @@ exports.DeleteBook=async(req,res)=>{
                 message:"Admin Id is missing !"
             })
         }
-        const deletedBook=await book.findOneAndDelete(
-          bookId
-        )
+        const deletedBook=await book.findOneAndDelete({_id:bookId})
         res.status(200).json({
             status:true,
           message: `Book '${deletedBook.title}' deleted successfully.`,

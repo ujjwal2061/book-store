@@ -9,8 +9,9 @@ export default function UpdateStorePage() {
   const [imageUploading, setImageUploading] = useState(false);
   const [error, setError] = useState(null);
   const { firstName, lastName } = admin?.data || {};
+  const [success ,setSuccess]=useState(null);
 
-  // Individual state for each form field
+
   const [author, setAuthor] = useState("");
   const [bookname, setBookname] = useState("");
   const [title, setTitle] = useState("");
@@ -20,7 +21,6 @@ export default function UpdateStorePage() {
   const [rating, setRating] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
-
   useEffect(() => {
     return () => {
       if (imagePreview) {
@@ -29,14 +29,20 @@ export default function UpdateStorePage() {
     };
   }, [imagePreview]);
 
-  // Cloudinary upload function
+ useEffect(()=>{
+  const remove=setTimeout(()=>{
+    if(error || success){
+      setSuccess(null);
+      setError(null);
+    }
+  },2000)
+  return ()=>clearTimeout(remove);
+ },[error,success])
   const uploadImageToCloudinary = async (file) => {
     try {
       setImageUploading(true);
-      
       const formData = new FormData();
       formData.append("file", file);
-
       const response = await axios.post(
         "http://localhost:3000/api/v1/admin/bookimage", 
         formData,{
@@ -67,9 +73,7 @@ export default function UpdateStorePage() {
     try {
       setLoading(true);
       setError(null);
-      
-      // Validation
-      if (!title || !author) {
+      if (!bookname|| !author) {
         setError("Please fill in the required fields");
         return;
       }
@@ -77,7 +81,6 @@ export default function UpdateStorePage() {
        if(imageUrl){
         image=await uploadImageToCloudinary(imageUrl)
        }
-      // Prepare book data as JSON
       const bookData = {
         author: author,
         bookname: bookname,
@@ -88,7 +91,6 @@ export default function UpdateStorePage() {
         rating: rating,
         image: image,
       };
-        console.log("Book Data",bookData)
       const response = await axios.post(
         "http://localhost:3000/api/v1/admin/storebooks",
         bookData,
@@ -102,16 +104,21 @@ export default function UpdateStorePage() {
       );
       const data=await response.data;
       if(response.status==200){
-        return data.message
+      setSuccess(data?.message || "Book add succesfully !");
+      setBookname("");
+      setTitle("");
+      setDescription("");
+      setPrice("");
+      setGenre("");
+      setRating("");
+      setImageUrl("");
+      setImagePreview(null);
+      return ;
       }else{
         throw new Error ("Failed to add book. Please try again.")
       }
-      resetForm();
-      
-      
     } catch (err) {
       setError(err.response?.data?.message || "Failed to add book. Please try again.");
-      console.error("Error adding book:", err);
     } finally {
       setLoading(false);
     }
@@ -131,35 +138,18 @@ export default function UpdateStorePage() {
 
   // Remove selected image
   const removeImage = () => {
-    
     if (imagePreview) {
       URL.revokeObjectURL(imagePreview);
     }
     setImageUrl("");
     setImagePreview(null);
-  
     const fileInput = document.querySelector('input[type="file"]');
     if (fileInput) {
       fileInput.value = '';
     }
   };
 
-  // Reset form function
-  const resetForm = () => {
-    // Cleanup the object URL to prevent memory leak
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-    }
-    setAuthor("");
-    setBookname("");
-    setTitle("");
-    setDescription("");
-    setPrice("");
-    setGenre("");
-    setRating("");
-    setImageUrl("");
-    setImagePreview(null);
-  };
+
 
   if (!admin?.data) return <p>Loading admin info...</p>;
 
@@ -168,8 +158,12 @@ export default function UpdateStorePage() {
       <div className="w-full max-w-3xl bg-white rounded-lg shadow-md p-6 space-y-6">
         <h1 className="text-3xl font-bold text-center text-gray-800">
           Add Book to Store
-        </h1>
-        
+        </h1> 
+        {success && (
+            <div className="bg-green-200 border border-green-200 text-green-500 px-4 py-3 rounded-md">
+             {success}
+            </div>
+        )}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
             {error}

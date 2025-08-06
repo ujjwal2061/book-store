@@ -91,7 +91,6 @@ exports.LoginAccount=async(req,res)=>{
 exports.UserInfo=async(req,res)=>{
     try{
  const userdb=await user.findById(req.userId);
- console.log(userdb)
  if(!userdb){
     return res.status(400).json({
         status:false,
@@ -100,8 +99,6 @@ exports.UserInfo=async(req,res)=>{
  }
  const userInfoWithoutPassowrd={...userdb.toObject()};
  delete userInfoWithoutPassowrd.password;
-
- console.log("User Info",userdb);
   res.status(200).json({
     status:true,
      data:{
@@ -109,7 +106,10 @@ exports.UserInfo=async(req,res)=>{
      }
   })
     }catch(err){
-        console.log("Error",err)
+        res.status(500).json({
+            status:false,
+            message:"Something Went Wrong"
+        })
     }
 }
 //  find a book by the search 
