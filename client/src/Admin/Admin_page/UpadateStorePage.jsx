@@ -1,179 +1,316 @@
-import { useContext, useState } from "react";
-import { Usercontext } from "../../Users/context/userContext";
-import { Loader } from "lucide-react";
+import { useContext, useState, useEffect } from "react";
+import { Loader, X } from "lucide-react";
 import axios from "axios";
-export default function UpadateStorePage() {
-  const { user } = useContext(Usercontext);
-  const { firstname, lastname } = user.data;
-  const [loading ,setLoading]=useState(false);
-  const [error  ,setError]=useState(null)
-  const [preview, setPreview] = useState("");
-  // form handle 
-  const [form, setForm] = useState({
-    author: "",
-    bookname: "",
-    title: "",
-    description: "",
-    image: "",
-    price: "",
-    genre: "",
-    rating: "",
-  });
-  const token=localStorage.getItem("adminToken");
-  const handleForm = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
+import { AdminContext } from "../Admincontext/Admin-context";
 
-  const handleImagePreview = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setPreview(imageUrl);
-      setForm((prev) => ({ ...prev, image: file }));
+export default function UpdateStorePage() {
+  const { admin, token } = useContext(AdminContext);
+  const [loading, setLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [error, setError] = useState(null);
+  const { firstName, lastName } = admin?.data || {};
+
+  // Individual state for each form field
+  const [author, setAuthor] = useState("");
+  const [bookname, setBookname] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [genre, setGenre] = useState("");
+  const [rating, setRating] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [imagePreview, setImagePreview] = useState(null);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
+
+  // Cloudinary upload function
+  const uploadImageToCloudinary = async (file) => {
+    try {
+      setImageUploading(true);
+      
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/admin/bookimage", 
+        formData,{
+          headers:{
+        Authorization: `Bearer ${token}`,
+          },
+          withCredentials:true
+
+        }
+      );
+      const data=await response.data;
+      if(response.status==200){
+        return data.link
+      }else{
+       throw new Error ("Uplaoding Fail Please Try again") 
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw new Error("Failed to upload image");
+    } finally {
+      setImageUploading(false);
     }
   };
- const handleBookAdd=async(e)=>{
-  alert("hello")
- e.preventDefault()
- try{
-  setLoading(true)
-  setError(null);
-  // sending the formaData
-  const formData=new FormData();
-  if(!form.title || !form.author){
-    setError("Fill the filed please");
-    return
-  }
-  formData.append("author",form.author);
-     formData.append("bookname", form.bookname);
-    formData.append("title", form.title);
-    formData.append("description", form.description);
-    formData.append("price", form.price);
-    formData.append("genre", form.genre);
 
-    
-      const  response=await axios.post("http://localhost:3000/api/v1/admin/storebooks",
-        formData,
-        {
+  // Handle form submission
+  const handleBookAdd = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError(null);
       
-          headers:{
-              Authorization:`Bearer ${token}`,
-            "Content-Type":"application/josn"
+      // Validation
+      if (!title || !author) {
+        setError("Please fill in the required fields");
+        return;
+      }
+       let image=null;
+       if(imageUrl){
+        image=await uploadImageToCloudinary(imageUrl)
+       }
+      // Prepare book data as JSON
+      const bookData = {
+        author: author,
+        bookname: bookname,
+        title: title,
+        description: description,
+        price: price,
+        genre: genre,
+        rating: rating,
+        image: image,
+      };
+        console.log("Book Data",bookData)
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/admin/storebooks",
+        bookData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-            withCredentials:true
-        },
-       
-       
-      )
-      console.log("Data",response);
-      setForm({
-        author: "",
-        bookname: "",
-        title: "",
-        description: "",
-        image: "",
-        price: "",
-        genre: "",
-        rating: "",
-      });
-}catch(err){
- setError(err || "Try again")
-}finally{
-  setLoading(false)
-}
- }
+          withCredentials: true,
+        }
+      );
+      const data=await response.data;
+      if(response.status==200){
+        return data.message
+      }else{
+        throw new Error ("Failed to add book. Please try again.")
+      }
+      resetForm();
+      
+      
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to add book. Please try again.");
+      console.error("Error adding book:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle image selection and preview
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageUrl(file);
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  // Remove selected image
+  const removeImage = () => {
+    
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setImageUrl("");
+    setImagePreview(null);
+  
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
+  // Reset form function
+  const resetForm = () => {
+    // Cleanup the object URL to prevent memory leak
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setAuthor("");
+    setBookname("");
+    setTitle("");
+    setDescription("");
+    setPrice("");
+    setGenre("");
+    setRating("");
+    setImageUrl("");
+    setImagePreview(null);
+  };
+
+  if (!admin?.data) return <p>Loading admin info...</p>;
+
   return (
     <div className="min-h-screen flex justify-center items-start bg-gray-50 p-4">
       <div className="w-full max-w-3xl bg-white rounded-lg shadow-md p-6 space-y-6">
-        <h1 className="text-3xl font-bold text-center text-gray-800">Add Book to Store</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800">
+          Add Book to Store
+        </h1>
+        
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+            {error}
+          </div>
+        )}
+        
         <form onSubmit={handleBookAdd} className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <InputField
-              label="Author Name"
+              label="Author Name *"
               name="author"
-              placeholder={`${firstname} ${lastname}`}
-              value={form.author}
-              onChange={handleForm}
+              placeholder={`${firstName} ${lastName}`}
+              value={author}
+              onChange={(e) => setAuthor(e.target.value)}
             />
             <InputField
               label="Book Name"
               name="bookname"
-              placeholder="Bookname"
-              value={form.bookname}
-              onChange={handleForm}
+              placeholder="Book Name"
+              value={bookname}
+              onChange={(e) => setBookname(e.target.value)}
             />
           </div>
 
           <InputField
-            label="Title"
+            label="Title *"
             name="title"
-            placeholder="Rich and Poor Dad"
-            value={form.title}
-            onChange={handleForm}
+            placeholder="Rich Dad Poor Dad"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
 
           <TextAreaField
             label="Description"
             name="description"
-            placeholder="Some description"
-            value={form.description}
-            onChange={handleForm}
+            placeholder="Book description..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
 
           <div className="flex flex-col sm:flex-row gap-4">
             <InputField
               label="Price"
               name="price"
-              placeholder="Price"
-              value={form.price}
-              onChange={handleForm}
+              placeholder="29.99"
+              type="number"
+              step="0.01"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
             />
             <InputField
               label="Genre"
               name="genre"
-              placeholder="Genre"
-              value={form.genre}
-              onChange={handleForm}
+              placeholder="Fiction, Non-fiction, etc."
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
             />
             <InputField
               label="Rating"
               name="rating"
-              placeholder="Rating"
-              value={form.rating}
-              onChange={handleForm}
+              placeholder="4.5"
+              type="number"
+              step="0.1"
+              min="0"
+              max="5"
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
             />
           </div>
 
-          <div className="flex flex-col gap-2 ml-2">
-            <label className="font-semibold">
-              <span className="bg-mycolor  rounded-md px-2 text-white cursor-pointer py-1.5">
-              Upload Image  
-              </span>
-            <input
-              type="file"
-              name="image"
-              onChange={handleImagePreview}
-              className=" hidden file:px-4 file:py-2 file:rounded-md file:border-0  file:bg-mycolor file:text-white  cursor-pointer"
-              />
+          <div className="flex flex-col gap-4 ml-2">
+            <div className="flex flex-col gap-2">
+              <label className="font-semibold text-gray-700">Book Image</label>
+              
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="relative inline-block">
+                  <img 
+                    src={imagePreview} 
+                    alt="Book preview" 
+                    className="w-32 h-40 object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                    title="Remove image"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
+              
+              {/* Upload Button */}
+              <label className="font-semibold">
+                <span className="bg-mycolor rounded-md px-2 text-white cursor-pointer py-1.5 inline-flex items-center gap-2 hover:bg-opacity-90 transition-colors">
+                  {imageUploading ? (
+                    <>
+                      <Loader className="animate-spin w-4 h-4" />
+                      Uploading...
+                    </>
+                  ) : (
+                    imagePreview ? "Change Image" : "Upload Image"
+                  )}
+                </span>
+                <input
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  disabled={imageUploading}
+                  className="hidden"
+                />
               </label>
+              
+              {/* Status Message */}
+              {imageUrl && !imagePreview && (
+                <p className="text-sm text-green-600">✓ Image selected successfully</p>
+              )}
+              {imagePreview && (
+                <p className="text-sm text-blue-600">✓ Image ready for upload</p>
+              )}
+            </div>
           </div>
 
-          {preview && (
-            <div className="w-full rounded-md overflow-hidden mt-4">
-              <img src={preview} alt="Preview" className="object-cover w-full h-72" />
-            </div>
-          )}
-          <div className=" flex  justify-start sm:justify-end md:justify-end px-2 py-1.5">
-            <button  className="rounded-md px-2 py-1.5 bg-mycolor text-white cursor-pointer">
-              {loading ?
-              <>
-              Adding
-              <Loader className="animate-spin" />
-              </>
-              :
-              <p>Addd to Store</p>
-              }
+         
+          
+          <div className="flex justify-start sm:justify-end md:justify-end px-2 py-1.5">
+            <button 
+              type="submit"
+              disabled={loading || imageUploading}
+              className="rounded-md px-4 py-2 bg-mycolor text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <Loader className="animate-spin w-4 h-4" />
+                  Adding...
+                </>
+              ) : (
+                "Add to Store"
+              )}
             </button>
           </div>
         </form>
@@ -196,7 +333,7 @@ function InputField({ label, ...props }) {
 
 function TextAreaField({ label, ...props }) {
   return (
-    <div className="flex flex-col  overflow-hidden">
+    <div className="flex flex-col overflow-hidden">
       <label className="text-sm font-medium text-gray-700 mb-1">{label}</label>
       <textarea
         rows={3}

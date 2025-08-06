@@ -1,10 +1,20 @@
-import { ChevronFirst, ChevronLast, LogOut, } from "lucide-react"
+import { ChevronFirst, ChevronLast, LogOut } from "lucide-react"
 import { createContext, useContext, useState } from "react"
+import { AdminContext } from "../Admincontext/Admin-context"
+import { useNavigate } from "react-router"
 
 const SideContext = createContext();
 
 export const Sidebar = ({ children }) => {
   const [expanded, setExpanded] = useState(true);
+  const { admin, logout } = useContext(AdminContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/admin-login");
+  };
+
   return (
     <aside className={`min-h-screen ${expanded ? "w-52" : "w-20"} transition-all duration-300`}>
       <nav className="h-full  fixed flex flex-col bg-neutral-100 border-r border-neutral-200 shadow-2xl">
@@ -28,17 +38,27 @@ export const Sidebar = ({ children }) => {
           {expanded && (
             <div className="flex justify-between items-center gap-2 w-full bg-gray-50 p-2 rounded-md shadow">
               <div className="leading-4">
-                <h4 className="font-semibold">John Doe</h4>
-                <span className="text-xs text-gray-600">john@gmail.com</span>
+                <h4 className="font-semibold">
+                  {admin?.data?.firstName || admin?.data?.firstname} {admin?.data?.lastName || admin?.data?.lastname}
+                </h4>
+                <span className="text-xs text-gray-600">{admin?.data?.email}</span>
               </div>
-              <button className="p-1 rounded-md hover:bg-red-500/20 cursor-pointer">
-                <LogOut />
+              <button 
+                onClick={handleLogout}
+                className="p-1 rounded-md hover:bg-red-500/20 cursor-pointer transition-colors"
+                title="Logout"
+              >
+                <LogOut className="text-red-600" size={18} />
               </button>
             </div>
           )}
           {!expanded && (
-            <button className="p-1 rounded-md hover:bg-red-500/20 cursor-pointer mx-auto">
-              <LogOut />
+            <button 
+              onClick={handleLogout}
+              className="p-1 rounded-md hover:bg-red-500/20 cursor-pointer mx-auto transition-colors"
+              title="Logout"
+            >
+              <LogOut className="text-red-600" size={18} />
             </button>
           )}
         </div>

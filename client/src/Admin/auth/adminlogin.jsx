@@ -56,6 +56,7 @@ const authProcess=(state ,action)=>{
       }
     )
     const res=await response.data;
+    console.log("Res at login :",res)
     if(res.status){
          localStorage.setItem("adminToken",res.token);
           return  route('/admin-dashbord')

@@ -1,5 +1,6 @@
-import { Twitter, Linkedin, Github, Mail, MapPin, Clock, Send } from "lucide-react";
+import { Twitter, Linkedin, Github, Mail, MapPin, Clock, Send, Shield, UserCheck } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -151,24 +152,60 @@ const Footer = () => {
         </div>
         
    
+        {/* Admin Portal Section */}
         <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="flex flex-col items-center space-y-6">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center justify-center gap-2">
+                <Shield className="text-blue-600" size={20} />
+                Admin Portal
+              </h3>
+              <p className="text-gray-600 text-sm mb-4">
+                Access the administrative dashboard to manage books, users, and store operations
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link 
+                  to="/admin-login"
+                  className="inline-flex items-center gap-2  text-black px-6 py-2.5 rounded-lg font-medium   border-1 border-mycolor "
+                >
+                  <UserCheck size={16} />
+                  Admin Login
+                </Link>
+                <Link 
+                  to="/admin-signup"
+                  className="inline-flex items-center gap-2 bg-mycolor text-white px-6 py-2.5 rounded-lg font-medium  transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  <Shield size={16} />
+                  Admin Register
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Footer */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-center md:text-left">
               <p className="text-gray-600 text-sm">
-                © 2025 . All rights reserved.
+                © 2025 BookStore. All rights reserved.
               </p>
             </div>
             <div className="flex flex-wrap justify-center md:justify-end gap-4 text-sm">
-              <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
+              <a href="#" className="text-gray-600 hover:text-mycolor transition-colors duration-200 font-medium">
                 Privacy Policy
               </a>
               <span className="text-gray-300">|</span>
-              <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
+              <a href="#" className="text-gray-600 hover:text-mycolor transition-colors duration-200 font-medium">
                 Terms of Service
               </a>
               <span className="text-gray-300">|</span>
-              <a href="#" className="text-gray-600 hover:text-blue-600 transition-colors duration-200">
+              <a href="#" className="text-gray-600 hover:text-mycolor transition-colors duration-200 font-medium">
                 Cookie Policy
+              </a>
+              <span className="text-gray-300">|</span>
+              <a href="#" className="text-gray-600 hover:text-mycolor transition-colors duration-200 font-medium">
+                Support
               </a>
             </div>
           </div>
