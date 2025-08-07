@@ -2,7 +2,7 @@ import React from "react";
 
 const Content = () => {
   return (
-    <div className="px-2 md:px-4 lg:px-12 py-6 ">
+    <div className="  mt-2 max-w-screen-xl mx-auto w-full  ">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
         <div className="bg-gradient-to-br from-[#cccfff] to-[#b8bbff] rounded-2xl overflow-hidden  ">
           <div className="flex flex-col sm:flex-row items-center justify-between h-full min-h-[280px]">
@@ -18,7 +18,7 @@ const Content = () => {
                 SHOP NOW
               </button>
             </div>
-            <div className="flex items-center justify-center px-4 py-4 order-1 sm:order-2">
+            <div className="flex items-center justify-center  order-1 sm:order-2">
               <div className="w-40 h-32 sm:w-44 sm:h-36 rounded-lg flex items-center justify-center ">
                 <img src="content_book.png" className="object-cover" />
               </div>
@@ -153,9 +153,8 @@ const Content = () => {
     </div>
   </div>
 </div>
-
-      </div>
-    </div>
+</div>
+ </div>
   );
 };
 

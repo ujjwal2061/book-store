@@ -27,7 +27,8 @@ const adimSchema=new mongoose.Schema({
     firstName:{type:String,require:true},
     lastName:{type:String,require:true},
     email:{type:String,require:true},
-    password:{type:String,require:true}
+    password:{type:String,require:true},
+    createdId:{type:String}
 })
 // purchase Schema
 const purchaseSchema=new mongoose.Schema({

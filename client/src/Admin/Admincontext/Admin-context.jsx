@@ -7,6 +7,9 @@ export const AdminContext = createContext(null);
 
 const AdminSetupContext = ({ children }) => {
   const [admin, setAdmin] = useState(null);
+  const [loading ,setLoading]=useState(false);
+  const [error,setError]=useState(null);
+  const [books,setBooks]=useState([{}]);
   const token = localStorage.getItem("adminToken");
 
   // Admin logout function
@@ -39,10 +42,37 @@ const AdminSetupContext = ({ children }) => {
     };
     Getadmin();
   }, []);
+  // get the books
+    useEffect(()=>{
+    const adminBooks=async()=>{
+      try{
+        setLoading(true);
+        const response=await axios.get( `http://localhost:3000/api/v1/admin/dashbord`,{
+           headers:{
+            Authorization:`Bearer ${token}`
+         },
+         withCredentials:true
+        })
+        const res=response.data?.data;
+        setBooks(res);
+      }catch(err){
+        setError( "Something went Wrong  Please try again !")
+      }finally{
+        setLoading(false);
+      }
+    }
+    adminBooks();
+  },[])
   const Adminvalue = {
     admin,
     token,
-    logout
+    logout,
+    loading,
+    setLoading,
+    setBooks,
+    books,
+    error,
+    setError
   };
   return <AdminContext.Provider value={Adminvalue}>{children}</AdminContext.Provider>;
 };

@@ -4,22 +4,15 @@ import {
   User2Icon, 
   Mail, 
   Shield, 
-  Calendar, 
-  Edit3, 
-  Save, 
-  X, 
+  Calendar,  
   Activity
 } from "lucide-react";
 
 export const AccountPage = () => {
-  const { admin} = useContext(AdminContext);
-  const [isEditing, setIsEditing] = useState(false);
+  const {admin,books} = useContext(AdminContext);
   const [activeTab, setActiveTab] = useState("profile");
-  const [editData, setEditData] = useState({
-    firstName: "",
-    lastName: "",
-    email: ""
-  });
+  
+  const adminInfo = admin?.data;
 
   if (!admin) {
     return (
@@ -32,33 +25,6 @@ export const AccountPage = () => {
     );
   }
 
-  const adminInfo = admin?.data;
-
-  const handleEditToggle = () => {
-    if (isEditing) {
-      setEditData({
-        firstName: adminInfo?.firstName || adminInfo?.firstname || "",
-        lastName: adminInfo?.lastName || adminInfo?.lastname || "",
-        email: adminInfo?.email || ""
-      });
-    }
-    setIsEditing(!isEditing);
-  };
-
-  const handleSave = async () => {
-
-    console.log("Saving admin profile:", editData);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    setEditData({
-      firstName: "",
-      lastName: "",
-      email: ""
-    });
-  };
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User2Icon },
@@ -66,16 +32,9 @@ export const AccountPage = () => {
 
   const renderProfileTab = () => (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-sm border p-6">
+      <div className="bg-white rounded-lg shadow-sm  p-6">
         <div className="flex items-start justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900">Admin Profile</h2>
-          <button
-            onClick={handleEditToggle}
-            className="flex items-center  cursor-pointer gap-2 px-4 py-2 bg-mycolor text-white rounded-lg  transition-colors"
-          >
-            <Edit3 size={16} />
-            {isEditing ? "Cancel" : "Edit Profile"}
-          </button>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-6 items-start">
@@ -86,43 +45,6 @@ export const AccountPage = () => {
           </div>
 
           <div className="flex-1 space-y-4">
-            {isEditing ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    value={editData.firstName}
-                    onChange={(e) => setEditData({ ...editData, firstName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    value={editData.lastName}
-                    onChange={(e) => setEditData({ ...editData, lastName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={editData.email}
-                    onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-            ) : (
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <User2Icon size={18} className="text-gray-500" />
@@ -157,50 +79,19 @@ export const AccountPage = () => {
                   </div>
                 </div>
               </div>
-            )}
-
-            {isEditing && (
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={handleSave}
-                  className="flex items-center gap-2 px-4 py-2 cursor-pointer  bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <Save size={16} />
-                  Save Changes
-                </button>
-                <button
-                  onClick={handleCancel}
-                  className="flex items-center gap-2 px-4 py-2 cursor-pointer  bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  <X size={16} />
-                  Cancel
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg shadow-sm border p-4">
+        <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <Activity size={20} className="text-blue-600" />
             </div>
             <div>
               <p className="text-sm text-gray-500">Total Books</p>
-              <p className="text-xl font-semibold text-gray-900">0</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow-sm border p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <Activity size={20} className="text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Active Users</p>
-              <p className="text-xl font-semibold text-gray-900">0</p>
+              <p className="text-xl font-semibold text-gray-900">{books?.length || 0}</p>
             </div>
           </div>
         </div>

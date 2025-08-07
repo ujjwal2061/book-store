@@ -230,7 +230,6 @@ exports.BookById = async (req, res) => {
       //
     }
     const bookInfo = await book.findById(bookId);
-    console.log("Book Infromation ->", bookInfo);
     res.status(200).json({
       status: true,
       message: "Book Info ->",
