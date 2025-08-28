@@ -1,83 +1,53 @@
-
-import { Link } from "react-router";
-import { useReducer } from "react";
+import { Link, useNavigate } from "react-router";
 import { LoaderIcon } from "lucide-react";
-import { useNavigate } from "react-router";
 import axios from "axios";
-// during first redner initvalue of the form 
+import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormMessage,
+  FormItem,
+  FormField,
+  FormLabel,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+
+// ✅ Zod schema for validation
+const LoginSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+});
 
 const Login = () => {
-  const navigation=useNavigate();
-    // during first redner initvalue of the form 
-const initValue={
-    email:"",
-    password:"",
-    loading:false,
-    error:null,
-} 
-//  function 
-const authProcess=(state ,action)=>{
-    switch(action.type){
-        case 'SET_EMAIL' :
-            return {...state ,email:action.payload}
-        case 'SET_PASSWORD':
-            return {...state ,password:action.payload}    
-        case 'LOGIN_START' :
-            return {...state ,loading:true ,error:null}
-        case 'LOGIN_FAIL':
-            return {...state ,loading:false ,error:action.payload}
-         default:
-            return state;
-        } 
-}
-  const [state ,dispatch]=useReducer( authProcess ,initValue)
-   // function for the handling the action type
-   const hadnleEmail=(e)=>{
-    dispatch({type:'SET_EMAIL' ,payload:e.target.value})
-   }
-  const hadnlePassword=(e)=>{
-    dispatch({type:'SET_PASSWORD' ,payload:e.target.value})
-   }
+  const navigate = useNavigate();
 
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    dispatch({type:"LOGIN_START"})
-     try{
-      const  response=await axios.post("http://localhost:3000/api/v1/user/login",
-        {
-          firstname:state.firstname,
-          lastname:state.lastname,
-          email:state.email,
-          password:state.password 
-        },{
-          headers:{"Content-Type":"application/json" }
-        }
-      )
-      const res= await response.data;
-      if(res.status){
-         localStorage.setItem("authToken",res.token);
-          return navigation('/')
+  const form = useForm({
+    resolver: zodResolver(LoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const handleLogin = async (values) => {
+    try {
+      const res = await axios.post("http://localhost:3000/api/v1/user/login", values, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (res.status === 200) {
+        toast.success("Login successful!");
+        localStorage.setItem("authToken", res.data.token); 
+        navigate("/");
       }
-      state.firstname="";
-      state.lastname="";
-      state.email="";
-      state.password="";
-      return res;
-     }catch (err) {
-      if(err.response?.data?.errors){
-        const zodErro=err.response.data.errors;
-        const Error={};
-        zodErro.forEach(element => {
-          const field=zodErro.path[0];
-          Error[field]=zodErro.message;
-        });
-        dispatch({ type: "SET_FIELD_ERRORS", payload: errorMap });
-      } 
-      else{
-        dispatch({ type: "SET_SIGNUP_FAIL", payload: err.message });
-      }
-    }finally{
-        dispatch({type:'SET_SIGNUP_DONE'})
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || "Login failed!";
+      toast.error(errorMsg);
+      console.error(err);
     }
   };
 
@@ -87,54 +57,65 @@ const authProcess=(state ,action)=>{
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h2>
         </div>
-        <form  onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
-              type="email"
-              value={state.email}
-              onChange={hadnleEmail}
-              placeholder="example@gmail.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1  focus:ring-mycolor focus:border-mycolor transition-colors"
-            />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <input
-              type="password"
-              value={state.password}
-              onChange={hadnlePassword}
-              placeholder="Enter your password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-mycolor focus:border-mycolor transition-colors"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="example@gmail.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <button
-             type="subbmit" disabled={state.loading}
-            className="w-full bg-mycolor text-white py-2 px-4 rounded-md cursor-pointer focus:outline-none focus:ring-2  transition-colors font-medium">
-            {state.loading ? 
-              <span className="flex items-center gap-2 justify-center">
-                <p>Login</p>  <LoaderIcon className="animate-spin" />
-               </span> 
-                :<p>Login</p>}
-          </button>
-           {state.error && <p style={{ color: 'red' }}>{state.error}</p>}
-        </form>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="********" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? (
+                <>
+                  Logging in <LoaderIcon className="ml-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                "Login"
+              )}
+            </Button>
+          </form>
+        </Form>
 
         <div className="mt-6 text-center space-y-2">
           <p className="text-sm text-gray-600">
             Don't have an account?{" "}
             <Link
               to="/signup"
-              className="text-blue-600 cursor-pointer  hover:text-blue-700 font-medium">
+              className="text-blue-600 cursor-pointer hover:text-blue-700 font-medium">
               Sign up
             </Link>
           </p>
           <p className="text-sm">
             <Link
-              to="/restpassword"
-              className=" cursor-pointer text-blue-600 hover:text-blue-700 font-medium">
+              to="/resetpassword"
+              className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium">
               Forgot password?
             </Link>
           </p>

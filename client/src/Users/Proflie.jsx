@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router"
 import { Usercontext } from "./context/userContext"
 import { User2Icon, LogOut } from "lucide-react"
 
+import BookStore from "./store/Book_Store"
+
 export const Profile = () => {
   const { user, loading, logout } = useContext(Usercontext)
   const userInfo = user?.data;
@@ -39,7 +41,7 @@ export const Profile = () => {
 
       {location.pathname === "/profile/store" ? (
         <div className="py-4 px-5">
-          <p className="text-gray-500">You haven't placed any orders yet.</p>
+         <BookStore />
         </div>
       ) : (
         <div className="flex gap-4 bg-slate-100 rounded-md p-4">

@@ -1,116 +1,274 @@
-import { Star, ShoppingCart, Heart,  } from 'lucide-react';
-import { useState } from 'react';
-import { Link } from 'react-router';
+import { useState, useEffect } from "react";
+import { Loader, X, Upload } from "lucide-react";
+import axios from "axios";
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
-export const BookStore = () => {
- 
+function BookStore() {
+  const [loading, setLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [author, setAuthor] = useState("");
+  const [bookname, setBookname] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [genre, setGenre] = useState("");
+  const [rating, setRating] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [imagePreview, setImagePreview] = useState(null);
+const token = localStorage.getItem("authToken");
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
 
-  const books = [
-    {
-      author: "George Orwell",
-      bookname: "1984",
-      title: "dystopia1984",
-      description: "A novel about a dystopian future where Big Brother watches all.",
-      image: "https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg",
-      price: "299",
-      rating: 4.8,
-      genre: "Dystopian",
-    },
+  // Upload Image
+  const uploadImageToCloudinary = async (file) => {
+    try {
+      setImageUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/user/bookimage",
+        formData,
         {
-      author: "George Orwell",
-      bookname: "1984",
-      title: "dystopia1984",
-      description: "A novel about a dystopian future where Big Brother watches all.",
-      image: "https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg",
-      price: "299",
-      rating: 4.8,
-      genre: "Dystopian",
-    },
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+
+      const data = response.data;
+      if (response.status === 200) {
+        return data.link;
+      } else {
+        toast.error("Uploading failed .Please try again")
+      }
+    } catch (error) {
+     if(err){
+         toast.error(err.response?.data?.message || "Faild to add book")
+     }
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
+  // Handle Form Submit
+  const handleBookAdd = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      if (!bookname || !author) {
+        setError("Please fill in the required fields");
+        return;
+      }
+      let image = null;
+      if (imageUrl) {
+        image = await uploadImageToCloudinary(imageUrl);
+      }
+      const bookData = {
+        author,
+        bookname,
+        title,
+        description,
+        price,
+        genre,
+        rating,
+        image,
+      };
+      const response = await axios.post(
+        "http://localhost:3000/api/v1/user/storebooks",
+        bookData,
         {
-      author: "George Orwell",
-      bookname: "1984",
-      title: "dystopia1984",
-      description: "A novel about a dystopian future where Big Brother watches all.",
-      image: "https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg",
-      price: "299",
-      rating: 4.8,
-      genre: "Dystopian",
-    },
-          {
-      author: "George Orwell",
-      bookname: "1984",
-      title: "dystopia1984",
-      description: "A novel about a dystopian future where Big Brother watches all.",
-      image: "https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg",
-      price: "299",
-      rating: 4.8,
-      genre: "Dystopian",
-    },
-          {
-      author: "George Orwell",
-      bookname: "1984",
-      title: "dystopia1984",
-      description: "A novel about a dystopian future where Big Brother watches all.",
-      image: "https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg",
-      price: "299",
-      rating: 4.8,
-      genre: "Dystopian",
-    },
-          {
-      author: "George Orwell",
-      bookname: "1984",
-      title: "dystopia1984",
-      description: "A novel about a dystopian future where Big Brother watches all.",
-      image: "https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg",
-      price: "299",
-      rating: 4.8,
-      genre: "Dystopian",
-    },
-  ];
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      const data = response.data;
+      if (response.status === 200) {
+        setSuccess(data?.message || "Book added successfully!");
+        setBookname("");
+        setTitle("");
+        setDescription("");
+        setPrice("");
+        setGenre("");
+        setRating("");
+        setImageUrl("");
+        setImagePreview(null);
+        return;
+      }
+    } catch (err) {
+       if(err){
+        toast.error(err.response?.data?.message || "Faild to add book")
+       }else{
+        toast.err("Something went wrong")
+       }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-
-
- 
-
+  // Handle Image Select
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageUrl(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+  const removeImage = () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImageUrl("");
+    setImagePreview(null);
+  };
   return (
-  <div className="min-h-screen  bg-neutral-200 px-2 py-5  md:px-16  md:py-12">
-     <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 '>
-      {books.map((book,idx)=>(
-        <div  key={idx} className=' flex flex-col sm:max-w-md w-auto   sm:flex-row rounded-xl bg-neutral-50 hover:bg-neutral-300 transition-all duration-300  ease-in-out  cursor-pointer shadow px-1 py-2'>
-        <div className='sm:w-52 w-full p-1 '>
-          <img src="https://i.pinimg.com/1200x/24/9c/c4/249cc4deb76e9ec56712f7f1179bb315.jpg"  className='object-cover rounded-xl w-full h-full'/>
-        </div>
-            <div className="flex flex-col gap-3  px-2">
+    <div className="min-h-screen flex justify-center items-start bg-gray-50 p-6">
+      <Card className="w-full max-w-3xl shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">
+            Add Book to Store
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+         
+          <form onSubmit={handleBookAdd} className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Author *</Label>
+                <Input
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  placeholder="Author name"
+                />
+              </div>
+              <div>
+                <Label>Book Name *</Label>
+                <Input
+                  value={bookname}
+                  onChange={(e) => setBookname(e.target.value)}
+                  placeholder="Book name"
+                />
+              </div>
+            </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{book.bookname}</h1>
-              <p className="text-sm text-gray-600 font-medium">
-                By <span className="text-gray-900 font-semibold">{book.author}</span>
-              </p>
+              <Label>Title *</Label>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Book Title"
+              />
             </div>
-            <div className="flex items-center gap-1 text-yellow-500">
-              <Star size={18} fill="currentColor" className="text-yellow-400" />
-              <span className="text-gray-800 text-sm font-semibold">{book.rating}</span>
-              <span className="ml-2 text-xs bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full">-20% OFF</span>
+            <div>
+              <Label>Description</Label>
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Book description..."
+              />
             </div>
-          <div className='flex flex-col gap-2  text-start'>
-                 <div className="text-lg font-bold text-gray-900">
-                ${book.price} <span className="line-through text-sm text-gray-400 ml-2">${book.originalPrice}</span>
-               </div>
-            <p className='text-sm leading-snug text-start tracking-tight font-semibold'>
-             {book.description}
-            </p>
-            <div className='flex flex-col gap-2  w-full '>
-              <button className="bg-mycolor cursor-pointer hover:bg-red-700 text-white py-2 px-4 rounded-full flex items-center justify-center gap-2 text-sm font-semibold transition">
-                <ShoppingCart size={18} /> Add to Cart
-              </button>
-              <p className="text-sm text-gray-600 font-medium">
-                Categories: <span className="text-gray-900 font-semibold">{book.genre}</span></p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <Label>Price</Label>
+                <Input
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="29.99"
+                />
+              </div>
+              <div>
+                <Label>Genre</Label>
+                <Input
+                  value={genre}
+                  onChange={(e) => setGenre(e.target.value)}
+                  placeholder="Fiction, Non-fiction..."
+                />
+              </div>
+              <div>
+                <Label>Rating</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={rating}
+                  onChange={(e) => setRating(e.target.value)}
+                  placeholder="4.5"
+                />
+              </div>
             </div>
-          </div>
-        </div>
-       </div>
-      ))}
+            <div className="space-y-2">
+              <Label>Book Image</Label>
+              {imagePreview && (
+                <div className="relative w-32">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-32 h-40 rounded-md border shadow-sm object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+              <div>
+                <label className="flex items-center justify-center gap-2 w-fit px-4 py-2 rounded-md bg-mycolor text-white cursor-pointer hover:bg-mycolor/90">
+                  {imageUploading ? (
+                    <>
+                      <Loader className="animate-spin w-4 h-4" /> Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={16} />{" "}
+                      {imagePreview ? "Change Image" : "Upload Image"}
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    disabled={imageUploading}
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                disabled={loading || imageUploading}
+                className={cn(
+                  "bg-mycolor text-white hover:bg-mycolor/90",
+                  (loading || imageUploading) && "opacity-50"
+                )}
+              >
+                {loading ? (
+                  <>
+                    <Loader className="animate-spin w-4 h-4 mr-2" /> Adding...
+                  </>
+                ) : (
+                  "Add to Store"
+                )}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
-  </div>
   );
-};
+}
+export default BookStore;

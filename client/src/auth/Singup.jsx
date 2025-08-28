@@ -1,187 +1,149 @@
-import { Link } from "react-router"; 
-import { useReducer } from "react";
+import { Link, useNavigate } from "react-router";
 import { LoaderIcon } from "lucide-react";
-import axios from "axios"
-import { useNavigate } from "react-router";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormMessage,
+  FormItem,
+  FormField,
+  FormLabel,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+
+const FormSchema = z.object({
+  firstname: z.string().min(4, { message: "Firstname must be at least 4 characters." }),
+  lastname: z.string().min(4, { message: "Lastname must be at least 4 characters." }),
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  confirmPassword: z.string().min(6),
+}).refine((data)=>data.password===data.confirmPassword,{
+   message: "The passwords did not match",
+    path: ["confirmPassword"],
+})
+
 
 const Signup = () => {
-  const navigation=useNavigate();
+  const navigate = useNavigate();
+  // form for the filed
+  const form = useForm({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-  const initValueOfSignup = {
-    firstname: "",
-    lastname:"",
-    email: "",
-    password: "",
-    loading: false,
-    error: null,
-    fieldErrors:{},
-  };
-
-
-  const authSignupProcess = (state, action) => {
-    switch (action.type) {
-      case "SET_FIRSTNAME":
-        return { ...state, firstname: action.payload };
-        case "SET_LASTNAME":
-        return { ...state, lastname: action.payload };
-      case "SET_EMAIL":
-        return { ...state, email: action.payload };
-      case "SET_PASSWORD":
-        return { ...state, password: action.payload };
-      case "SET_SIGNUP_START":
-        return { ...state, loading: true, error: null };
-        case "SET_SIGNUP_DONE":
-        return { ...state, loading: false, error: null };
-        case "SET_FIELD_ERRORS":
-      return { ...state, fieldErrors: action.payload };
-      case "SET_SIGNUP_FAIL":
-        return { ...state, loading: false, error: action.payload };
-      default:
-        return state;
-    }
-  };
-
-  const [state, dispatch] = useReducer(authSignupProcess, initValueOfSignup);
-
-
-  const handleUsername = (e) => {
-    dispatch({ type: "SET_FIRSTNAME", payload: e.target.value });
-  };
-  const lastUsername = (e) => {
-    dispatch({ type: "SET_LASTNAME", payload: e.target.value });
-  };
-  const handleEmail = (e) => {
-    dispatch({ type: "SET_EMAIL", payload: e.target.value });
-  };
-  const handlePassword = (e) => {
-    dispatch({ type: "SET_PASSWORD", payload: e.target.value });
-  };
-
-  const handleSignupForm = async(e) => {
-    e.preventDefault();
-    dispatch({ type: "SET_SIGNUP_START" });
+  const handleSignupForm = async (values) => {
     try {
-      //api call 
-      const  response=await axios.post("http://localhost:3000/api/v1/user/signup",
-        {
-          firstname:state.firstname,
-          lastname:state.lastname,
-          email:state.email,
-          password:state.password 
-        },{
-          headers:{"Content-Type":"application/json" }
-        }
-      )
-      const res= await response.data;
-      state.firstname="";
-      state.lastname="";
-      state.email="";
-      state.password="";
-      navigation('/login')
-      return res;
-      
-      
-    } catch (err) {
-      if(err.response?.data?.errors){
-        const zodErro=err.response.data.errors;
-        const Error={};
-        zodErro.forEach(element => {
-          const field=zodErro.path[0];
-          Error[field]=zodErro.message;
-        });
-        dispatch({ type: "SET_FIELD_ERRORS", payload: errorMap });
-      } 
-      else{
-        dispatch({ type: "SET_SIGNUP_FAIL", payload: err.message });
+     const res= await axios.post("http://localhost:3000/api/v1/user/signup", values, {
+        headers: { "Content-Type": "application/json" },
+      });
+      if(res.response==201){
+        toast.success("Account create succesfully")
       }
-    }finally{
-        dispatch({type:'SET_SIGNUP_DONE'})
+      navigate("/login");
+    } catch (err) {
+      if(err){
+        toast.error(err.response?.data?.message || "Fail to create Account !")
+      }
+      console.error(err);
     }
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 px-4 py-8">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg border border-gray-200 p-6 sm:p-8">
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Start your story today.</h2>
-        </div>
-
-        <form onSubmit={handleSignupForm} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-            <input
-              type="text"
-              value={state.firstname}
-              onChange={handleUsername}
-              placeholder="Enter your firstname"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-mycolor focus:border-mycolor transition-colors"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSignupForm)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="firstname"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="John" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {state.fieldErrors.firstname && (
-            <p className="text-red-500 text-sm mt-1">{state.fieldErrors.firstname}</p> )}
-          </div>
-           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-            <input
-              type="text"
-              value={state.lastname}
-              onChange={lastUsername}
-              placeholder="Enter your lastname"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-mycolor focus:border-mycolor transition-colors"
+            <FormField
+              control={form.control}
+              name="lastname"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {state.fieldErrors.lastname && (
-            <p className="text-red-500 text-sm mt-1">{state.fieldErrors.lastname}</p> )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-            <input
-              type="email"
-              value={state.email}
-              onChange={handleEmail}
-              placeholder="example@gmail.com"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1  focus:ring-mycolor focus:border-mycolor transition-colors"
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="JohDoe@gmail.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {state.fieldErrors.email && (
-            <p className="text-red-500 text-sm mt-1">{state.fieldErrors.email}</p> )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-            <input
-              type="password"
-              value={state.password}
-              onChange={handlePassword}
-              placeholder="Enter your password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-mycolor focus:border-mycolor transition-colors"
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="********" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            {state.fieldErrors.password && (
-            <p className="text-red-500 text-sm mt-1">{state.fieldErrors.password}</p> )}
-          </div>
-
-          <button
-            type="submit" 
-            disabled={state.loading}
-            className="w-full bg-mycolor text-white py-2 px-4 rounded-md cursor-pointer focus:outline-none focus:ring-2 transition-colors font-medium"
-          >
-            {state.loading ? (
-              <span className="flex items-center gap-2 justify-center">
-                <p>Creating account</p> <LoaderIcon className="animate-spin" />
-              </span>
-            ) : (
-              <p>Signup</p>
-            )}
-          </button>
-
-          {state.error && <p style={{ color: "red" }}>{state.error}</p>}
-        </form>
-
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="********" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full cursor-pointer">
+              {form.formState.isSubmitting ? (
+                <>
+                  Creating account <LoaderIcon className="ml-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                "Create Account"
+              )}
+            </Button>
+          </form>
+        </Form>
         <div className="mt-6 text-center space-y-2">
           <p className="text-sm text-gray-600">
             Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-blue-600 cursor-pointer hover:text-blue-700 font-medium"
-            >
+            <Link to="/login" className="text-blue-600 cursor-pointer hover:text-blue-700 font-medium">
               Login
             </Link>
           </p>
