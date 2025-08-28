@@ -1,6 +1,5 @@
 const  express=require("express")
 const userRouters=require("./routes/userRoute")
-const adminRouters=require("./routes/adminRouters")
 const cros=require("cors");
 const connectiondb=require("./config/db")
 require('dotenv').config()
@@ -13,7 +12,7 @@ app.use(cros({
     credentials:true
 }))
 
-const PORT=process.env.BACKEND_PORT;
+const PORT=process.env.BACKEND_PORT ;
 
 app.use(express.json())
 
@@ -23,7 +22,7 @@ app.get("/",(req,res)=>{
 connectiondb();
 
 app.use("/api/v1/user",userRouters)
-app.use("/api/v1/admin",adminRouters)
+
 
 
 app.listen(PORT,()=>{

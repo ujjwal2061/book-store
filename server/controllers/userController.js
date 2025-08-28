@@ -139,13 +139,101 @@ const searchItems=req.body;
         }) 
     }
 }
-// user buy Books 
-exports.PurchaseBook=async(req,res)=>{
-    try{
-        const userId=req.userId
-        
-    }catch(err){
+exports.StoreBooks = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { bookname, author, title, description, price, genre, image } =req.body;
 
+    if (!bookname || !author || !title || !description || !price || !genre) {
+      return res.status(400).json({
+        status: false,
+        message: "Please fill all Filed ",
+      });
     }
+    const checkbooksPresnt = await book.findOne({ bookname: bookname });
+    if (checkbooksPresnt) {
+      return res.status(400).json({
+        status: false,
+        message: "Book already presnt in store",
+      });
+    }
+    //
+    const newbook = new book({
+      author: author,
+      bookname: bookname,
+      title: title,
+      description: description,
+      price: price,
+      image: image,
+      genre: genre,
+      rating:0|| "",
+      createdId: userId,
+    });
+    await newbook.save();
+    res.status(200).json({
+      status: true,
+      message: "Book successfully added to store",
+    });
+  } catch (err) {
+    console.log("Error at store", err);
+    res.status(500).json({
+      message: err.error || "Something wrong ",
+    });
+  }
+};
+exports.AddImage=async(req,res)=>{
+  try{
+    if(!req.file){
+      return res.status(400).json({
+        status:false,
+        message:"No file uploaded"
+      })
+    }
+    const imageLink=req.file.path;
+    res.json({link:imageLink})
+  }catch(err){
+    console.log(err)
+     res.status(500).json({
+        status: "Fail",
+        msg: "Internal Server Error"
+      });
+  }
 }
+exports.BookById = async (req, res) => {
+  const bookId = req.params.id;
+  try {
+    if (!bookId) {
+      return res.status(400).json({
+        status: false,
+        message: "BookId is missing !",
+      });
+      //
+    }
+    const bookInfo = await book.findById(bookId);
+    res.status(200).json({
+      status: true,
+      message: "Book Info ->",
+      data: { bookInfo },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: false,
+      message: "Something went wrong !",
+    });
+  }
+};
 
+exports.AllbooksList = async (req, res) => {
+  try {
+    const allbooksListed = await book.find({});
+    res.status(200).json({
+      status: true,
+      message: "Booked listed",
+      data: allbooksListed,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.error || "Something wrong ",
+    });
+  }
+};
