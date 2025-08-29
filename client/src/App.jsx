@@ -7,6 +7,7 @@ import {  useContext } from "react"
 import {Usercontext} from "./Users/context/userContext"
 import  {Profile} from "./Users/Proflie"
 import BookStore from "./Users/Store/Book_Store"
+import Book_by_id from "./Users/store/Book_by_id"
 
 function App() {
  const {loading}=useContext(Usercontext);
@@ -18,6 +19,7 @@ function App() {
        <Route path="/profile" element={<Profile />} >
        <Route path="store" element={<BookStore />} />
       </Route>
+      <Route path="/book/:id"  element={<Book_by_id />} />
      </Route>
      
      <Route path="/login" element={<Login />} />
