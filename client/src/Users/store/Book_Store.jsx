@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import e from "cors";
 
 function BookStore() {
   const [loading, setLoading] = useState(false);
@@ -16,9 +17,7 @@ function BookStore() {
   const [bookname, setBookname] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [genre, setGenre] = useState("");
-  const [rating, setRating] = useState("");
+  const [pdf ,setPdf]=useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
 const token = localStorage.getItem("authToken");
@@ -77,13 +76,11 @@ const token = localStorage.getItem("authToken");
         bookname,
         title,
         description,
-        price,
-        genre,
-        rating,
+        pdf,
         image,
       };
       const response = await axios.post(
-        "http://localhost:3000/api/v1/user/storebooks",
+        "http://localhost:3000/api/v1/user/book-store",
         bookData,
         {
           headers: {
@@ -99,9 +96,6 @@ const token = localStorage.getItem("authToken");
         setBookname("");
         setTitle("");
         setDescription("");
-        setPrice("");
-        setGenre("");
-        setRating("");
         setImageUrl("");
         setImagePreview(null);
         return;
@@ -132,7 +126,7 @@ const token = localStorage.getItem("authToken");
     setImagePreview(null);
   };
   return (
-    <div className="min-h-screen flex justify-center items-start bg-gray-50 p-6">
+    <div className=" flex justify-center items-start p-6">
       <Card className="w-full max-w-3xl shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
@@ -176,37 +170,11 @@ const token = localStorage.getItem("authToken");
                 placeholder="Book description..."
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <Label>Price</Label>
-                <Input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="29.99"
-                />
-              </div>
-              <div>
-                <Label>Genre</Label>
-                <Input
-                  value={genre}
-                  onChange={(e) => setGenre(e.target.value)}
-                  placeholder="Fiction, Non-fiction..."
-                />
-              </div>
-              <div>
-                <Label>Rating</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  max="5"
-                  step="0.1"
-                  value={rating}
-                  onChange={(e) => setRating(e.target.value)}
-                  placeholder="4.5"
-                />
-              </div>
-            </div>
+            <Label>Book pdf:</Label>
+            <Input type="file" accept="application/pdf"  onChange={(e)=>setPdf(e.target.file[0])} />
+            <Button>
+              Uplaod
+            </Button>
             <div className="space-y-2">
               <Label>Book Image</Label>
               {imagePreview && (
@@ -226,7 +194,7 @@ const token = localStorage.getItem("authToken");
                 </div>
               )}
               <div>
-                <label className="flex items-center justify-center gap-2 w-fit px-4 py-2 rounded-md bg-mycolor text-white cursor-pointer hover:bg-mycolor/90">
+                <label className="flex items-center justify-center gap-2 w-fit px-4 py-2 rounded-md bg-black/90 text-white cursor-pointer">
                   {imageUploading ? (
                     <>
                       <Loader className="animate-spin w-4 h-4" /> Uploading...
@@ -252,7 +220,7 @@ const token = localStorage.getItem("authToken");
                 type="submit"
                 disabled={loading || imageUploading}
                 className={cn(
-                  "bg-mycolor text-white hover:bg-mycolor/90",
+                  " text-white ",
                   (loading || imageUploading) && "opacity-50"
                 )}
               >

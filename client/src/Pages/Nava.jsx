@@ -1,93 +1,94 @@
-import { Menu, X, User2Icon, ChevronDown, ChevronUp } from "lucide-react";
-import { useContext } from "react";
-import { useState } from "react";
-import { Link } from "react-router";
-import { Usercontext } from "../Users/context/userContext";
-import { useEffect } from "react";
+import { Menu, X, User2Icon } from "lucide-react"
+import { useContext, useEffect, useState } from "react"
+import { Link } from "react-router"
+import { Usercontext } from "../Users/context/userContext"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
+import { Theme } from "@/components/ui/theme-toggle" 
+
 const Nava = () => {
-  const [isMoblieOpen, setMoblieOpen] = useState(false);
-  const { user } = useContext(Usercontext);
-  const [IsScroll, setScroll] = useState(0);
+  const [isMobileOpen, setMobileOpen] = useState(false)
+  const { user } = useContext(Usercontext)
+  const [isScrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scroll = window.scrollY;
-      setScroll(scroll);
-    };
-    addEventListener("scroll", handleScroll);
-    return () => removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const secondaryLinks = [{ label: "Profile", link: "/profile" }];
+    const handleScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   return (
-    <div
-      className={`sticky top-0 w-full justify-center flex  z-20  ${
-        IsScroll >= 10 ? "bg-[#f8f8f8e2] backdrop-blur-md" : " bg-transparent"
-      }`}>
-      <div className="w-full max-w-7xl px-2 py-1">
-        <nav className=" flex  gap-2  items-center justify-between  sm:px-10  px-4 py-1">
-          <div>
-            <Link to="/" className="font-semibold font-serif cursor-pointer">
-              Perlego
-            </Link>
-          </div>
-
-          {user ? (
-            <div className="flex relative  md:hidden px-2 py-1  rounded-xl border-2  border-neutral-200 gap-2 cursor-pointer">
-              <Link to="/profile">
-                <User2Icon />
-              </Link>
-            </div>
-          ) : (
-            <div className="">
-              <button
-                onClick={() => setMoblieOpen(!isMoblieOpen)}
-                className="md:hidden   flex cursor-pointer justify-center shadow-2xl  p-2 rounded-full">
-                {isMoblieOpen ? <X /> : <Menu className="rounded-2xl" />}
-              </button>
-              {isMoblieOpen && (
-                <div className=" md:hidden   w-full z-30  border-transparent sm:w-72 shadow-2xl  rounded-md mt-1 absolute  right-0 flex flex-col border-2 p-2  gap-2 ">
-                  <Link to="/login">
-                    <Button className="w-full cursor-pointer shadow" variant="secondary">
-                      Login
-                    </Button>
-                  </Link>
-                  <Link to="/signup">
-                    <Button className="w-full cursor-pointer">Signup</Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-          <div className=" hidden relative  md:flex  font-sans font-semibold gap-2  items-center ">
+    <header
+      className={`sticky top-0 z-20 w-full transition-colors ${
+        isScrolled ? " bg-neutral-100 dark:bg-black/80 backdrop-blur-md shadow-sm" : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav className="flex items-center justify-between py-3">
+          <Link
+            to="/"
+            className="text-xl font-bold font-serif tracking-wide hover:opacity-80 transition"
+          >
+            Perlego
+          </Link>
+          <div className="hidden md:flex items-center gap-4">
             {user ? (
-              <div className=" flex px-4 py-1.5  rounded-xl border-2  border-neutral-200 gap-2 cursor-pointer">
-                <div className="flex items-center gap-1 ">
-                  <User2Icon />
-                  <Link to="/profile">
-                    <span>{user.data.firstname}</span>
-                  </Link>
-                </div>
-              </div>
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 px-3 py-1.5 border border-slate-100 dark:border-gray-900 rounded-lg  transition"
+              >
+                <User2Icon size={18} />
+                <span>{user.data.firstname}</span>
+              </Link>
             ) : (
               <>
                 <Link to="/login">
-                  <Button className="w-full cursor-pointer shadow" variant="secondary">
+                  <Button variant="secondary">Login</Button>
+                </Link>
+                <Link to="/signup">
+                  <Button>Signup</Button>
+                </Link>
+              </>
+            )}
+            <Theme />
+          </div>
+          <button
+            onClick={() => setMobileOpen(!isMobileOpen)}
+            className="md:hidden p-2 rounded-md "
+          >
+            {isMobileOpen ? <X /> : <Menu />}
+          </button>
+        </nav>
+        {isMobileOpen && (
+          <div className="md:hidden flex flex-col gap-2  p-3 rounded-lg  backdrop-blur-md">
+            {user ? (
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 px-3 py-2 rounded-md  transition"
+              >
+                <User2Icon size={18} />
+                <span>{user.data.firstname}</span>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="secondary" className="w-full">
                     Login
                   </Button>
                 </Link>
                 <Link to="/signup">
-                  <Button className="w-full cursor-pointer">Signup</Button>
+                  <Button className="w-full">Signup</Button>
                 </Link>
               </>
             )}
+            <div className="mt-2">
+              <Theme />
+            </div>
           </div>
-        </nav>
+        )}
       </div>
-    </div>
-  );
-};
-export default Nava;
+    </header>
+  )
+}
+
+export default Nava

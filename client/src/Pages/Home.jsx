@@ -80,19 +80,19 @@ const Home = () => {
             {bookss.map((book, index) => (
               <Card
                 key={index}
-                className="hover:shadow-lg transition-shadow duration-200 rounded-2xl overflow-hidden"
+                className="hover:shadow-lg transition-shadow  duration-200 rounded-2xl overflow-hidden"
               >
                 <img
                   src={book.image}
                   alt={book.bookname}
                   className="object-cover -mt-6 w-full h-full"
                 />
-                <CardHeader className="p-3">
-                  <h3 className="text-lg font-semibold text-gray-900">{book.bookname}</h3>
-                  <p className="text-sm text-gray-600">By {book.author}</p>
+                <CardHeader className="">
+                  <h3 className="text-lg font-semibold">{book.bookname}</h3>
+                  <p className="text-sm ">By {book.author}</p>
                 </CardHeader>
                 <div className="px-3 pb-2 flex flex-col gap-2">
-                  <p className="text-sm text-gray-700 line-clamp-2">{book.description}</p>
+                  <p className="text-sm  line-clamp-2">{book.description}</p>
                    <Button className="cursor-pointer w-full" variant="secondary">
                     <Download size={18} /> Download Book
                    </Button>

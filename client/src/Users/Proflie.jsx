@@ -19,8 +19,8 @@ export const Profile = () => {
   if (loading || !user) return <div>Loading...</div>
 
   return (
-    <div className="flex flex-col gap-4 p-4 justify-center">
-      <div className="flex justify-center">
+    <div className=" max-w-7xl w-full mx-auto flex flex-col gap-4 p-4 justify-center">
+      <div className="flex text-start">
         <h1 className="text-2xl font-semibold">My Account</h1>
       </div>
 
