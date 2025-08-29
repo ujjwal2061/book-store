@@ -1,5 +1,5 @@
 // login ,singup and deleteaccount  route there
-const {z} =require('zod');
+const {z, size} =require('zod');
 const bcrypt=require("bcrypt");
 const { user, book } = require('../model/scheam');
 const jwt=require('jsonwebtoken')
@@ -113,38 +113,14 @@ exports.UserInfo=async(req,res)=>{
     }
 }
 //  find a book by the search 
-exports.Getbooks=async(req,res)=>{
-const searchItems=req.body;
-    try{
-        const  booknameSerach=String(searchItems.name || " ")
-       const Items=await book.find({genre:{$regex:booknameSerach,$options:"i"}})
-  if(!Items){
-   return res.status(400).json({
-    status:false,
-    message:"Book is missing "
-  })
- }
- res.status(200).json({
-    status:true,
-    message:'Got your book',
-    data:{
-        data: Items,
-    }
-})
-    }catch(err){
-        res.status(500).json({
-            status:false,
-            message:'Someting went wrong',
-            errors:err
-        }) 
-    }
-}
+
 exports.StoreBooks = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { bookname, author, title, description, price, genre, image } =req.body;
+    // const userId = req.user.id;
+    // console.log(userId)
+    const { bookname, author,  description,pdfUrl, image } =req.body;
 
-    if (!bookname || !author || !title || !description || !price || !genre) {
+    if (!bookname || !author || !description) {
       return res.status(400).json({
         status: false,
         message: "Please fill all Filed ",
@@ -161,19 +137,18 @@ exports.StoreBooks = async (req, res) => {
     const newbook = new book({
       author: author,
       bookname: bookname,
-      title: title,
       description: description,
-      price: price,
-      image: image,
-      genre: genre,
-      rating:0|| "",
-      createdId: userId,
+      image:image,
+      pdfUrl:pdfUrl,
+      // createdId: userId,
     });
     await newbook.save();
     res.status(200).json({
       status: true,
       message: "Book successfully added to store",
     });
+    console.log(newbook)
+    return newbook;
   } catch (err) {
     console.log("Error at store", err);
     res.status(500).json({
@@ -212,8 +187,8 @@ exports.BookById = async (req, res) => {
     const bookInfo = await book.findById(bookId);
     res.status(200).json({
       status: true,
-      message: "Book Info ->",
-      data: { bookInfo },
+      message: "Book Info ",
+      data:  bookInfo ,
     });
   } catch (err) {
     res.status(500).json({
@@ -237,3 +212,29 @@ exports.AllbooksList = async (req, res) => {
     });
   }
 };
+// upload the book pdf
+exports.Uplodpdf=async(req,res)=>{
+  try{
+   if(!req.file){
+    return res.status(400).json({
+      status:false,
+      error:"No PDF file upload"
+    })
+  }
+  res.status(200).json({
+    message:"File uplaod sucessfully",
+    file:{
+        public_id: req.file.filename,         
+        originalName: req.file.originalname,   
+        url: req.file.path,
+        size: req.file.size,                       
+    }
+  })
+  }catch (err){
+    console.log(err)
+    res.status(500).json({
+      message: err.error || "Something wrong ",
+    });
+  }
+}
+
