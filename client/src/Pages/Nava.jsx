@@ -60,7 +60,7 @@ const Nava = () => {
           </button>
         </nav>
         {isMobileOpen && (
-          <div className="md:hidden flex flex-col gap-2  p-3 rounded-lg  backdrop-blur-md">
+          <div className="md:hidden flex items-center  gap-2  p-2 rounded-lg  backdrop-blur-md">
             {user ? (
               <Link
                 to="/profile"
