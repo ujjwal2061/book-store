@@ -35,7 +35,7 @@ const Login = () => {
 
   const handleLogin = async (values) => {
     try {
-      const res = await axios.post("http://localhost:3000/api/v1/user/login", values, {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_PORT}/api/v1/user/login`, values, {
         headers: { "Content-Type": "application/json" },
       });
 

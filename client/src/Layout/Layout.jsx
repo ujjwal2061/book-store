@@ -4,7 +4,7 @@ import { Outlet } from "react-router"
 import {Footer}  from "@/Pages/Footer"
 export default  function Screen(){
     return(
-       <div className="min-h-screen flex flex-col ">
+       <div className="min-h-screen dark:bg-black flex flex-col ">
         <Nava />
         <main className="flex-grow">
              <Outlet />

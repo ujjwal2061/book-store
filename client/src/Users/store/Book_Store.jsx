@@ -40,7 +40,7 @@ function BookStore() {
       formData.append("file", file);
       
       const response = await axios.post(
-        "http://localhost:3000/api/v1/user/bookpdf",
+        `${import.meta.env.VITE_BACKEND_PORT}/api/v1/user/bookpdf`,
         formData,
         {
           headers: { 
@@ -71,7 +71,7 @@ function BookStore() {
       formData.append("file", file);
 
       const response = await axios.post(
-        "http://localhost:3000/api/v1/user/bookimage",
+        `${import.meta.env.VITE_BACKEND_PORT}/api/v1/user/bookimage`,
         formData,
         {
           headers: { 
@@ -123,7 +123,7 @@ function BookStore() {
       };
       
       const response = await axios.post(
-        "http://localhost:3000/api/v1/user/book-store",
+        `${import.meta.env.VITE_BACKEND_PORT}/api/v1/user/book-store`,
         bookData,
         {
           headers: {
@@ -324,6 +324,7 @@ function BookStore() {
               </Button>
             </div>
           </form>
+          <p className="text-gray-400 hover:text-gray-700 text-sm">For pdf Compress <a href="https://pdf.pi7.org/compress-pdf-to-10mb" target="_blank" className="text-blue-500 hover:underline cursor-pointer">Check here</a></p>
         </CardContent>
       </Card>
     </div>

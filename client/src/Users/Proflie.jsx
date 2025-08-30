@@ -24,10 +24,10 @@ export const Profile = () => {
         <h1 className="text-2xl font-semibold">My Account</h1>
       </div>
 
-      <div className="flex justify-between items-center bg-slate-100 rounded-md p-3">
+      <div className="flex justify-between items-center dark:bg-neutral-900  dark:text-white bg-slate-100 rounded-md p-3">
         <div className="flex gap-4">
-          <Link to="/profile" className="text-xl font-medium text-gray-500 hover:text-mycolor transition-colors">My Profile</Link>
-          <Link to="/profile/store" className="text-xl font-medium text-gray-500 hover:text-mycolor transition-colors">My List</Link>
+          <Link to="/profile" className="text-xl font-medium   hover:text-slate-50/60 transition-colors">My Profile</Link>
+          <Link to="/profile/store" className="text-xl font-medium hover:text-slate-50/60 transition-colors">Add Books</Link>
         </div>
         <button
           onClick={handleLogout}
@@ -44,19 +44,19 @@ export const Profile = () => {
          <BookStore />
         </div>
       ) : (
-        <div className="flex gap-4 bg-slate-100 rounded-md p-4">
+        <div className="flex gap-4  dark:bg-neutral-900  bg-slate-100 rounded-md p-4">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <div className="rounded-full w-12 h-12 bg-neutral-300 flex items-center justify-center">
               <User2Icon size={28} />
             </div>
             <div className="flex flex-col">
               <div className="flex gap-2 items-center">
-                <h1 className="font-light text-gray-500">Name:</h1>
+                <h1 className="font-semibold">Name:</h1>
                 <span>{userInfo.firstname} {userInfo.lastname}</span>
               </div>
               <div className="flex gap-2 items-center">
-                <h1 className="font-light text-gray-500">Email:</h1>
-                <span>{userInfo.email}</span>
+                <h1 className="font-semibold ">Email:</h1>
+                <span className="text-base text-gray-200">{userInfo.email}</span>
               </div>
             </div>
           </div>

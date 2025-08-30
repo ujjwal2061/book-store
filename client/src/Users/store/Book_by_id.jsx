@@ -15,7 +15,7 @@ export default function Book_by_id() {
   useEffect(() => {
     const fetchbookbyId=async()=>{
         try{
-       const res= await axios.get(`http://localhost:3000/api/v1/user/books/${id}`)
+       const res= await axios.get(`${import.meta.env.VITE_BACKEND_PORT}/api/v1/user/books/${id}`)
         const data= res.data.data;
         setBook(data);
           const pdfRes = await axios.get(data.pdfUrl, { responseType: "arraybuffer" });

@@ -44,7 +44,7 @@ const Signup = () => {
 
   const handleSignupForm = async (values) => {
     try {
-     const res= await axios.post("http://localhost:3000/api/v1/user/signup", values, {
+     const res= await axios.post(`${import.meta.env.VITE_BACKEND_PORT}/api/v1/user/signup`, values, {
         headers: { "Content-Type": "application/json" },
       });
       if(res.response==201){

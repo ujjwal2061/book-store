@@ -25,7 +25,7 @@ export const ContextProvider = ({ children }) => {
       }
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:3000/api/v1/user/my-details", {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_PORT}/api/v1/user/my-details`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
