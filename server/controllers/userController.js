@@ -9,8 +9,7 @@ const SingupValidation=z.object({
     lastname:z.string(),
     email:z.string().email("Invlaid email"),
     password:z.string().min(6,'Password must be at leaste 6 characters')
-    .regex( /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/,
-    "Password must contain at least 1 letter, 1 number, and 1 special character")
+    
 })
 //Login Validation
 const LoginValidation=z.object({
@@ -80,7 +79,7 @@ exports.LoginAccount=async(req,res)=>{
             message:"User Login successfully "
         },)
     }catch(err){
-     console.log(err)
+     
         res.status(400).json({
             status:false,
             message:err.errors?.[0]?.message || 'Validaation error'
