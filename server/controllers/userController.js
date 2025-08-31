@@ -207,6 +207,7 @@ exports.AllbooksList = async (req, res) => {
       data: allbooksListed,
     });
   } catch (err) {
+    
     res.status(500).json({
       message: err.error || "Something wrong ",
     });
