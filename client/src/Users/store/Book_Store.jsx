@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-function BookStore() {
+export function BookStore() {
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   const [pdfUploading, setPdfUploading] = useState(false);
@@ -331,4 +331,3 @@ function BookStore() {
   );
 }
 
-export default BookStore;

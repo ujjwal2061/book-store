@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router";
+import LoadingPage from "@/components/ui/loading-page";
 
 const Home = () => {
   const [books ,setBooks]=useState([]);
@@ -31,6 +32,9 @@ const Home = () => {
     fetchbooks()
   },[])
 
+  if(loading){
+    return <LoadingPage />
+  }
   return (
    <div className="w-full justify-center flex">
   <section className="max-w-7xl w-full px-2 mx-auto">

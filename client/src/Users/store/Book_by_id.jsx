@@ -4,6 +4,7 @@ import axios from "axios";
 import { LoaderIcon } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker.min?url";
+import LoadingPage from "@/components/ui/loading-page";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
@@ -41,11 +42,7 @@ export default function Book_by_id() {
   }, [id]);
 
   if (!book) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center text-lg font-semibold">
-        Loading book <LoaderIcon  className="animate-spin"/>
-      </div>
-    );
+    return <LoadingPage />
   }
 
   return (

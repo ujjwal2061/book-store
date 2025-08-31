@@ -2,8 +2,8 @@ import { useContext } from "react"
 import { Link, useLocation, useNavigate } from "react-router"
 import { Usercontext } from "./context/userContext"
 import { User2Icon, LogOut } from "lucide-react"
+import { BookStore } from "./store/Book_Store"
 
-import BookStore from "./store/Book_Store"
 
 export const Profile = () => {
   const { user, loading, logout } = useContext(Usercontext)

@@ -6,12 +6,13 @@ import Layout from "./Layout/Layout"
 import {  useContext } from "react"
 import {Usercontext} from "./Users/context/userContext"
 import  {Profile} from "./Users/Proflie"
-import BookStore from "./Users/Store/Book_Store"
+import { BookStore } from "./Users/store/Book_Store"
 import Book_by_id from "./Users/store/Book_by_id"
+import LoadingPage from "./components/ui/loading-page"
 
 function App() {
  const {loading}=useContext(Usercontext);
- if(loading) return<p>Loading..</p>
+ if(loading) return<LoadingPage />
   return (
    <Routes>
      <Route path="/" element={<Layout />} >
