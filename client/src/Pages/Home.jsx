@@ -49,7 +49,7 @@ const Home = () => {
   </p>
 
   <div className="mt-8 flex justify-center gap-4">
-    <Link to="/books">
+    <Link to="/">
       <Button size="lg" className="px-6 py-3 text-base font-semibold">
         Read Books
       </Button>
