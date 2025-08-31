@@ -6,7 +6,7 @@ require('dotenv').config()
 
 const app=express();
 app.use(cros({
-    origin:["http://localhost:5173" ,""],
+    origin:["http://localhost:5173" ,"https://perlego.vercel.app/"],
     allowedHeaders:['Content-Type','Authorization'],
     methods:['GET','POST','DELETE','OPTIONS'],
     credentials:true
