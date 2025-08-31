@@ -65,7 +65,7 @@ const Login = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="dark:text-white">Email</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="example@gmail.com" {...field} />
                   </FormControl>
@@ -79,7 +79,7 @@ const Login = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="dark:text-white">Password</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="********" {...field} />
                   </FormControl>
@@ -112,13 +112,7 @@ const Login = () => {
               Sign up
             </Link>
           </p>
-          <p className="text-sm">
-            <Link
-              to="/resetpassword"
-              className="cursor-pointer text-blue-600 hover:text-blue-700 font-medium">
-              Forgot password?
-            </Link>
-          </p>
+          
         </div>
       </div>
     </div>
