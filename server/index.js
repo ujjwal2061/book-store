@@ -6,13 +6,13 @@ require('dotenv').config()
 
 const app=express();
 app.use(cros({
-    origin:["http://localhost:5173" ,"https://perlego.vercel.app/"],
+    origin:["http://localhost:5173" ,"https://perlego.vercel.app"],
     allowedHeaders:['Content-Type','Authorization'],
     methods:['GET','POST','DELETE','OPTIONS'],
     credentials:true
 }))
 
-const PORT=process.env.BACKEND_PORT ;
+const PORT=process.env.BACKEND_PORT  || 3000;
 
 app.use(express.json())
 
